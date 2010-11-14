@@ -59,16 +59,26 @@ end
 logger = create_logger
 http   = create_http_client(logger)
 
-url = "http://slashdot.jp/hardware/10/11/14/0416243.shtml"
-src = http.get(url)
-p url2 = get_canonical_url(src)
+url1 = "http://slashdot.jp/hardware/10/11/14/0416243.shtml"
+src1 = http.get(url1)
 
-params2 = {
-  "threshold"   => "1",
-  "mode"        => "nested",
-  "commentsort" => "0",
-}
+p url2 = get_canonical_url(src1)
+p url3 = merge_query(url2,
+  "threshold"   => "1",      # 閾値: 1
+  "mode"        => "nested", # ネストする
+  "commentsort" => "0")      # 古い順
 
-p url4 = merge_query(url2, params2)
-p src4 = http.get(url4)
-File.open("tmp.html", "wb") { |file| file.write(src4) }
+
+src3 = http.get(url3)
+#File.open("tmp.html", "wb") { |file| file.write(src3) }
+
+doc3 = Nokogiri.HTML(src3)
+
+p title  = doc3.xpath("//*[@id='articles']//div[@class='title']/h3/a/text()").text
+p author = doc3.xpath("//*[@id='articles']//div[@class='details']/a/text()").text
+p time   = doc3.xpath("//*[@id='articles']//div[@class='details']/a").first.next_sibling.text.gsub(/\s+/, "")
+p part   = doc3.xpath("//*[@id='articles']//div[@class='details']/br").first.next_sibling.text.gsub(/\s+/, "")
+
+puts "---"
+p body = doc3.xpath("//*[@id='articles']//div[@class='intro']").inner_html.strip
+
