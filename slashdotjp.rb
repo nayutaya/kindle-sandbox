@@ -2,6 +2,7 @@
 
 require "open-uri"
 require "uri"
+require "cgi"
 require "rubygems"
 require "log4r"
 require "nokogiri"
@@ -38,5 +39,26 @@ p url2 = get_canonical_url(src)
 #src2 = http.get(url2)
 
 p uri = URI.parse(url2)
+params = uri.query.split("&").
+  map { |pair| raise unless /^(.+?)=(.+?)$/ =~ pair; [$1, $2] }.
+  map { |key, value| [CGI.unescape(key), CGI.unescape(value)] }.
+  inject({}) { |memo, (key, value)| memo[key] = value; memo }
 
+params2 = {
+  "threshold"   => "1",
+  "mode"        => "nested",
+  "commentsort" => "0",
+}
+p params
 
+params3 = params.merge(params2)
+
+p query = params3.sort_by { |key, value| key }.
+  map { |key, value| [CGI.escape(key), CGI.escape(value)] }.
+  map { |key, value|  "#{key}=#{value}" }.
+  join("&")
+
+uri.query = query
+p url4 = uri.to_s
+p src4 = http.get(url4)
+File.open("tmp.html", "wb") { |file| file.write(src4) }
