@@ -41,6 +41,20 @@ def parse_query(query)
     inject({}) { |memo, (key, value)| memo[key] = value; memo }
 end
 
+def build_query(params)
+  return params.
+    sort_by { |key, value| key }.
+    map { |key, value| [CGI.escape(key), CGI.escape(value)] }.
+    map { |key, value|  "#{key}=#{value}" }.
+    join("&")
+end
+
+def merge_query(url, params)
+  uri = URI.parse(url)
+  uri.query = build_query(parse_query(uri.query).merge(params))
+  return uri.to_s
+end
+
 
 logger = create_logger
 http   = create_http_client(logger)
@@ -48,28 +62,13 @@ http   = create_http_client(logger)
 url = "http://slashdot.jp/hardware/10/11/14/0416243.shtml"
 src = http.get(url)
 p url2 = get_canonical_url(src)
-#src2 = http.get(url2)
-
-p uri = URI.parse(url2)
-params = parse_query(uri.query)
-
-exit
 
 params2 = {
   "threshold"   => "1",
   "mode"        => "nested",
   "commentsort" => "0",
 }
-p params
 
-params3 = params.merge(params2)
-
-p query = params3.sort_by { |key, value| key }.
-  map { |key, value| [CGI.escape(key), CGI.escape(value)] }.
-  map { |key, value|  "#{key}=#{value}" }.
-  join("&")
-
-uri.query = query
-p url4 = uri.to_s
+p url4 = merge_query(url2, params2)
 p src4 = http.get(url4)
 File.open("tmp.html", "wb") { |file| file.write(src4) }
