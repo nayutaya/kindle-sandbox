@@ -11,6 +11,14 @@ $: << File.join(File.dirname(__FILE__), "lib")
 require "http/factory"
 require "http/message_pack_store"
 
+def create_http_client(logger)
+  store = HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "cache"))
+  return HttpClient::Factory.create_client(
+    :logger   => logger,
+    :interval => 1.0,
+    :store    => store)
+end
+
 def create_logger
   formatter = Log4r::PatternFormatter.new(:pattern => "%d [%l] %M", :date_pattern => "%H:%M:%S")
   outputter = Log4r::StderrOutputter.new("", :formatter => formatter)
@@ -26,12 +34,16 @@ def get_canonical_url(src)
   return url
 end
 
+def parse_query(query)
+  return query.split("&").
+    map { |pair| raise unless /^(.+?)=(.+?)$/ =~ pair; [$1, $2] }.
+    map { |key, value| [CGI.unescape(key), CGI.unescape(value)] }.
+    inject({}) { |memo, (key, value)| memo[key] = value; memo }
+end
+
 
 logger = create_logger
-http   = HttpClient::Factory.create_client(
-  :logger   => logger,
-  :interval => 2.0,
-  :store    => HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "cache")))
+http   = create_http_client(logger)
 
 url = "http://slashdot.jp/hardware/10/11/14/0416243.shtml"
 src = http.get(url)
@@ -39,10 +51,9 @@ p url2 = get_canonical_url(src)
 #src2 = http.get(url2)
 
 p uri = URI.parse(url2)
-params = uri.query.split("&").
-  map { |pair| raise unless /^(.+?)=(.+?)$/ =~ pair; [$1, $2] }.
-  map { |key, value| [CGI.unescape(key), CGI.unescape(value)] }.
-  inject({}) { |memo, (key, value)| memo[key] = value; memo }
+params = parse_query(uri.query)
+
+exit
 
 params2 = {
   "threshold"   => "1",
