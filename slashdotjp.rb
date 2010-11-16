@@ -6,6 +6,7 @@ require "cgi"
 require "rubygems"
 require "log4r"
 require "nokogiri"
+require "json"
 
 $: << File.join(File.dirname(__FILE__), "lib")
 require "http/factory"
@@ -74,12 +75,18 @@ def extract_information(doc)
     end
   }.join("")
 
+  body = doc.xpath("//*[@id='articles']//div[@class='intro']").first
+  body.remove_attribute("class")
+
+  comments = doc.xpath("//*[@id='commentlisting']").first
+  comments.remove_attribute("class")
+
   return {
-    :title           => doc.xpath("//*[@id='articles']//div[@class='title']/h3/a/text()").text.strip,
-    :published       => details.split(/\n/)[0],
-    :department      => details.split(/\n/)[1],
-    :body_element    => doc.xpath("//*[@id='articles']//div[@class='intro']"),
-    :comment_element => doc.xpath("//*[@id='commentlisting']"),
+    "title"           => doc.xpath("//*[@id='articles']//div[@class='title']/h3/a/text()").text.strip,
+    "published"       => details.split(/\n/)[0],
+    "department"      => details.split(/\n/)[1],
+    "body_element"    => body,
+    "comment_element" => comments,
   }
 end
 
@@ -150,16 +157,19 @@ def parse(src)
   remove_id_attributes(doc)
 
   return {
-    :title        => info[:title],
-    :published    => info[:published],
-    :department   => info[:department],
-    :body_html    => info[:body_element].to_html,
-    :comment_html => info[:comment_element].to_html,
+    "title"        => info["title"],
+    "published"    => info["published"],
+    "department"   => info["department"],
+    "body_html"    => info["body_element"].to_html,
+    "comment_html" => info["comment_element"].to_html,
   }
 end
 
 x = parse(src3)
 
+puts(x.to_json)
+
+=begin
 File.open("out.html", "wb") { |file|
   file.puts("<html><body>")
   file.puts(x[:body_html])
@@ -168,3 +178,4 @@ File.open("out.html", "wb") { |file|
 #  puts(comments.to_html)
   file.puts("</body></html>")
 }
+=end
