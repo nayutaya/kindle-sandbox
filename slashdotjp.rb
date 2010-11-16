@@ -140,20 +140,31 @@ url3 = merge_query(url2,
 src3 = http.get(url3)
 #File.open("tmp.html", "wb") { |file| file.write(src3) }
 
-doc = Nokogiri.HTML(src3)
+def parse(src)
+  doc = Nokogiri.HTML(src)
+  remove_unnecessary_elements(doc)
+  remove_unnecessary_comment_elements(doc)
+  adjust_comment_title_elements(doc)
+  adjust_comment_body_elements(doc)
+  info = extract_information(doc)
+  remove_id_attributes(doc)
 
-remove_unnecessary_elements(doc)
-remove_unnecessary_comment_elements(doc)
-adjust_comment_title_elements(doc)
-adjust_comment_body_elements(doc)
-info = extract_information(doc)
-p info
-remove_id_attributes(doc)
+  return {
+    :title        => info[:title],
+    :published    => info[:published],
+    :department   => info[:department],
+    :body_html    => info[:body_element].to_html,
+    :comment_html => info[:comment_element].to_html,
+  }
+end
 
+x = parse(src3)
 
 File.open("out.html", "wb") { |file|
   file.puts("<html><body>")
-  file.puts(info[:comment_element].to_html)
+  file.puts(x[:body_html])
+  file.puts("<hr>")
+  file.puts(x[:comment_html])
 #  puts(comments.to_html)
   file.puts("</body></html>")
 }
