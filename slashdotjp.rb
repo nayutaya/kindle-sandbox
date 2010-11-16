@@ -82,11 +82,11 @@ def extract_information(doc)
   comments.remove_attribute("class")
 
   return {
-    "title"           => doc.xpath("//*[@id='articles']//div[@class='title']/h3/a/text()").text.strip,
-    "published"       => details.split(/\n/)[0],
-    "department"      => details.split(/\n/)[1],
-    "body_element"    => body,
-    "comment_element" => comments,
+    "title"            => doc.xpath("//*[@id='articles']//div[@class='title']/h3/a/text()").text.strip,
+    "published"        => details.split(/\n/)[0],
+    "department"       => details.split(/\n/)[1],
+    "body_element"     => body,
+    "comments_element" => comments,
   }
 end
 
@@ -158,25 +158,24 @@ def parse(src)
   remove_id_attributes(doc)
 
   return {
-    "title"        => info["title"],
-    "published"    => info["published"],
-    "department"   => info["department"],
-    "body_html"    => info["body_element"].to_xml,
-    "comment_html" => info["comment_element"].to_xml,
+    "title"         => info["title"],
+    "published"     => info["published"],
+    "department"    => info["department"],
+    "body_html"     => info["body_element"].to_xml(:encoding => "UTF-8"),
+    "comments_html" => info["comments_element"].to_xml(:encoding => "UTF-8"),
   }
 end
 
 x = parse(src3)
 
-puts(x.to_json)
+#puts(x.to_json)
 
-=begin
+#=begin
 File.open("out.html", "wb") { |file|
   file.puts("<html><body>")
-  file.puts(x[:body_html])
+  file.puts(x["body_html"])
   file.puts("<hr>")
-  file.puts(x[:comment_html])
-#  puts(comments.to_html)
+  file.puts(x["comments_html"])
   file.puts("</body></html>")
 }
-=end
+#=end
