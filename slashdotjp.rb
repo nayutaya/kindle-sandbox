@@ -161,8 +161,8 @@ def parse(src)
     "title"        => info["title"],
     "published"    => info["published"],
     "department"   => info["department"],
-    "body_html"    => info["body_element"].to_html,
-    "comment_html" => info["comment_element"].to_html,
+    "body_html"    => info["body_element"].to_xml,
+    "comment_html" => info["comment_element"].to_xml,
   }
 end
 
