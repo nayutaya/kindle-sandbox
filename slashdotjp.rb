@@ -72,13 +72,43 @@ p url3 = merge_query(url2,
 src3 = http.get(url3)
 #File.open("tmp.html", "wb") { |file| file.write(src3) }
 
-doc3 = Nokogiri.HTML(src3)
+doc = Nokogiri.HTML(src3)
 
-p title  = doc3.xpath("//*[@id='articles']//div[@class='title']/h3/a/text()").text
-p author = doc3.xpath("//*[@id='articles']//div[@class='details']/a/text()").text
-p time   = doc3.xpath("//*[@id='articles']//div[@class='details']/a").first.next_sibling.text.gsub(/\s+/, "")
-p part   = doc3.xpath("//*[@id='articles']//div[@class='details']/br").first.next_sibling.text.gsub(/\s+/, "")
+doc.xpath("//comment()").remove
+
+=begin
+doc.xpath("//text()").
+  select { |node| node.to_s.strip.empty? }.
+  each   { |node| node.remove }
+doc.xpath("//script").remove
+doc.xpath("//noscript").remove
+doc.xpath("/html/head/meta").remove
+doc.xpath("/html/head/link").remove
+=end
+
+p title  = doc.xpath("//*[@id='articles']//div[@class='title']/h3/a/text()").text
+
+details = doc.xpath("//*[@id='articles']//div[@class='details']")
+puts "---"
+puts details.inner_html
+
+p details.xpath("a")
+
+details.xpath("a").each { |node|
+  text = Nokogiri::XML::Text.new(node.text, doc)
+  p text
+  node.replace(text)
+}
 
 puts "---"
-p body = doc3.xpath("//*[@id='articles']//div[@class='intro']").inner_html.strip
+puts details.inner_html
 
+
+=begin
+p author = doc.xpath("//*[@id='articles']//div[@class='details']/a/text()").text
+p time   = doc.xpath("//*[@id='articles']//div[@class='details']/a").first.next_sibling.text.gsub(/\s+/, "")
+p part   = doc.xpath("//*[@id='articles']//div[@class='details']/br").first.next_sibling.text.gsub(/\s+/, "")
+
+puts "---"
+p body = doc.xpath("//*[@id='articles']//div[@class='intro']").inner_html.strip
+=end
