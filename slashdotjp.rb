@@ -88,26 +88,52 @@ doc.xpath("/html/head/link").remove
 
 p title  = doc.xpath("//*[@id='articles']//div[@class='title']/h3/a/text()").text
 
-details = doc.xpath("//*[@id='articles']//div[@class='details']")
+details = doc.xpath("//*[@id='articles']//div[@class='details']").first
 puts "---"
 puts details.inner_html
 
-p details.xpath("a")
-
 details.xpath("a").each { |node|
-  text = Nokogiri::XML::Text.new(node.text, doc)
-  p text
-  node.replace(text)
+  text = node.text
+  node.replace(Nokogiri::XML::Text.new(text, doc))
 }
 
 puts "---"
 puts details.inner_html
 
+details.xpath("text()").each { |node|
+  text = node.text
+  text.gsub!(/\s+/, " ")
+  text.strip!
+  node.replace(Nokogiri::XML::Text.new(text, doc))
+}
+
+puts "---"
+puts details.inner_html
+
+text = ""
+details.xpath("node()").each { |node|
+  p node
+  if node.text?
+    text << node.text
+  elsif node.element? && node.name == "br"
+    text << "\n"
+  else
+    raise
+  end
+}
+p text
+
+p published  = text[/\A(.+?)\n(.+?)\z/, 1]
+p department = text[/\A(.+?)\n(.+?)\z/, 2]
+
+=begin
+puts "---"
+p published  = details.xpath("br").xpath("following-sibling::*")#.text#.gsub(/\s+/, "")
+p department = details.xpath("br").first.next_sibling.text#.gsub(/\s+/, "")
+=end
 
 =begin
 p author = doc.xpath("//*[@id='articles']//div[@class='details']/a/text()").text
-p time   = doc.xpath("//*[@id='articles']//div[@class='details']/a").first.next_sibling.text.gsub(/\s+/, "")
-p part   = doc.xpath("//*[@id='articles']//div[@class='details']/br").first.next_sibling.text.gsub(/\s+/, "")
 
 puts "---"
 p body = doc.xpath("//*[@id='articles']//div[@class='intro']").inner_html.strip
