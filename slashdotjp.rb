@@ -191,9 +191,9 @@ end
 
 x = parse(src3)
 
-#puts(x.to_json)
+puts(x.to_json)
 
-#=begin
+=begin
 File.open("out.html", "wb") { |file|
   file.puts("<html><body>")
   file.puts(x["body_html"])
@@ -201,4 +201,4 @@ File.open("out.html", "wb") { |file|
   file.puts(x["comments_html"])
   file.puts("</body></html>")
 }
-#=end
+=end
