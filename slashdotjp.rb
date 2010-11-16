@@ -116,11 +116,16 @@ def adjust_comment_title_elements(doc)
   }
 end
 
-def adjust_comment_body_elements(doc)
+def adjust_comment_info_elements(doc)
   doc.xpath("//*[@id='commentlisting']//div[@class='details']//a").each { |node|
     text = node.text.strip
     node.replace(Nokogiri::XML::Text.new(text, doc))
   }
+
+  doc.xpath("//*[@id='commentlisting']//div[@class='details']//small").remove
+end
+
+def adjust_comment_body_elements(doc)
   doc.xpath("//*[@id='commentlisting']//li/b/a").each { |node|
     text = node.text.strip
     node.replace(Nokogiri::XML::Text.new(text, doc))
@@ -153,6 +158,7 @@ def parse(src)
   remove_unnecessary_elements(doc)
   remove_unnecessary_comment_elements(doc)
   adjust_comment_title_elements(doc)
+  adjust_comment_info_elements(doc)
   adjust_comment_body_elements(doc)
   info = extract_information(doc)
   remove_id_attributes(doc)
@@ -161,8 +167,8 @@ def parse(src)
     "title"         => info["title"],
     "published"     => info["published"],
     "department"    => info["department"],
-    "body_html"     => info["body_element"].to_xml(:encoding => "UTF-8"),
-    "comments_html" => info["comments_element"].to_xml(:encoding => "UTF-8"),
+    "body_html"     => info["body_element"].to_xml(:indent => 1, :encoding => "UTF-8"),
+    "comments_html" => info["comments_element"].to_xml(:indent => 1, :encoding => "UTF-8"),
   }
 end
 
