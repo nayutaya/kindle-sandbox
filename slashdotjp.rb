@@ -137,7 +137,8 @@ end
 logger = create_logger
 http   = create_http_client(logger)
 
-url1 = "http://slashdot.jp/hardware/10/11/14/0416243.shtml"
+#url1 = "http://slashdot.jp/hardware/10/11/14/0416243.shtml"
+url1 = ARGV[0]
 src1 = http.get(url1)
 url2 = get_canonical_url(src1)
 url3 = merge_query(url2,
