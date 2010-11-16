@@ -75,66 +75,22 @@ src3 = http.get(url3)
 doc = Nokogiri.HTML(src3)
 
 doc.xpath("//comment()").remove
-
-=begin
-doc.xpath("//text()").
-  select { |node| node.to_s.strip.empty? }.
-  each   { |node| node.remove }
 doc.xpath("//script").remove
 doc.xpath("//noscript").remove
-doc.xpath("/html/head/meta").remove
-doc.xpath("/html/head/link").remove
-=end
 
-p title  = doc.xpath("//*[@id='articles']//div[@class='title']/h3/a/text()").text
-
-details = doc.xpath("//*[@id='articles']//div[@class='details']").first
-puts "---"
-puts details.inner_html
-
-details.xpath("a").each { |node|
-  text = node.text
-  node.replace(Nokogiri::XML::Text.new(text, doc))
-}
-
-puts "---"
-puts details.inner_html
-
-details.xpath("text()").each { |node|
-  text = node.text
-  text.gsub!(/\s+/, " ")
-  text.strip!
-  node.replace(Nokogiri::XML::Text.new(text, doc))
-}
-
-puts "---"
-puts details.inner_html
-
-text = ""
-details.xpath("node()").each { |node|
-  p node
-  if node.text?
-    text << node.text
-  elsif node.element? && node.name == "br"
-    text << "\n"
-  else
-    raise
+details = doc.xpath("//*[@id='articles']//div[@class='details']/node()").map { |node|
+  case
+  when node.text?                         then node.text.gsub(/\s+/, " ").strip
+  when node.element? && node.name == "a"  then node.text.strip
+  when node.element? && node.name == "br" then "\n"
+  else raise("unexcepted node")
   end
-}
-p text
-
-p published  = text[/\A(.+?)\n(.+?)\z/, 1]
-p department = text[/\A(.+?)\n(.+?)\z/, 2]
-
-=begin
-puts "---"
-p published  = details.xpath("br").xpath("following-sibling::*")#.text#.gsub(/\s+/, "")
-p department = details.xpath("br").first.next_sibling.text#.gsub(/\s+/, "")
-=end
-
-=begin
-p author = doc.xpath("//*[@id='articles']//div[@class='details']/a/text()").text
+}.join("")
 
 puts "---"
-p body = doc.xpath("//*[@id='articles']//div[@class='intro']").inner_html.strip
-=end
+p({
+  :title      => doc.xpath("//*[@id='articles']//div[@class='title']/h3/a/text()").text.strip,
+  :published  => details.split(/\n/)[0],
+  :department => details.split(/\n/)[1],
+  :body_html  => doc.xpath("//*[@id='articles']//div[@class='intro']").inner_html.strip,
+})
