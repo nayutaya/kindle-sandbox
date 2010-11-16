@@ -117,18 +117,35 @@ def adjust_comment_title_elements(doc)
 end
 
 def adjust_comment_info_elements(doc)
+  doc.xpath("//*[@id='commentlisting']//div[@class='details']//small").remove
+
   doc.xpath("//*[@id='commentlisting']//div[@class='details']//a").each { |node|
     text = node.text.strip
     node.replace(Nokogiri::XML::Text.new(text, doc))
   }
-
-  doc.xpath("//*[@id='commentlisting']//div[@class='details']//small").remove
+  doc.xpath("//*[@id='commentlisting']//div[@class='details']//span").each { |node|
+    node.remove_attribute("class")
+  }
+  doc.xpath("//*[@id='commentlisting']//div[@class='details']//text()").each { |node|
+    text = node.text.strip.gsub(/\s+/, " ")
+    node.replace(Nokogiri::XML::Text.new(text, doc))
+  }
+  doc.xpath("//*[@id='commentlisting']//div").each { |node|
+    if node[:class] == "commentTop newcomment"
+      node.set_attribute("class", "info")
+    end
+  }
 end
 
 def adjust_comment_body_elements(doc)
   doc.xpath("//*[@id='commentlisting']//li/b/a").each { |node|
     text = node.text.strip
     node.replace(Nokogiri::XML::Text.new(text, doc))
+  }
+  doc.xpath("//*[@id='commentlisting']//div").each { |node|
+    if node[:class] == "commentBody"
+      node.set_attribute("class", "body")
+    end
   }
 end
 
