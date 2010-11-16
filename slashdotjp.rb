@@ -94,3 +94,36 @@ p({
   :department => details.split(/\n/)[1],
   :body_html  => doc.xpath("//*[@id='articles']//div[@class='intro']").inner_html.strip,
 })
+
+
+puts "---"
+doc.xpath("//*[@id='commentlisting']//text()").
+  select { |node| node.to_s.strip.empty? }.
+  each   { |node| node.remove }
+
+doc.xpath("//*[@id='commentlisting']//h4/a").each { |node|
+  text = node.text
+  text.strip!
+  node.replace(Nokogiri::XML::Text.new(text, doc))
+}
+
+doc.xpath("//*[@id='commentlisting']//h4/span").each { |node|
+  text = node.text
+  text.strip!
+  elem = Nokogiri::XML::Element.new("span", doc)
+  elem.add_child(Nokogiri::XML::Text.new(text, doc))
+  node.replace(elem)
+}
+
+doc.xpath("//*[@id='commentlisting']//div[@class='commentstatus']").remove
+doc.xpath("//*[@id='commentlisting']//div[@class='commentSub']").remove
+
+
+puts "---"
+comments = doc.xpath("//*[@id='commentlisting']")
+
+File.open("out.html", "wb") { |file|
+  file.puts("<html><body>")
+  file.puts(comments.inner_html)
+  file.puts("</body></html>")
+}
