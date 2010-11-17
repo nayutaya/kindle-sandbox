@@ -38,7 +38,7 @@ def remove_unnecessary_elements(doc)
   doc.xpath("//script").remove
   doc.xpath("//noscript").remove
   doc.xpath("//text()").
-    select { |node| node.to_s.strip.empty? }.
+    select { |node| node.text.strip.empty? }.
     each   { |node| node.remove }
 end
 
@@ -79,27 +79,17 @@ def get_body_element(doc)
   return body
 end
 
-
-
 def parse(src, url)
   doc = Nokogiri.HTML(src)
+
   remove_unnecessary_elements(doc)
 
-#  puts "---"
-#  puts doc.to_xml(:indent => 1, :encoding => "UTF-8")
-
-#  puts "---"
-  title        = get_title(doc)
-  published    = get_published(doc)
-  images       = get_images(doc, url)
-  body_element = get_body_element(doc)
-
-  puts "---"
-  puts title
-  puts published
-  p images
-  puts body_element.to_xml(:indent => 1, :encoding => "UTF-8")
-
+  return {
+    "title"     => get_title(doc),
+    "published" => get_published(doc),
+    "images"    => get_images(doc, url),
+    "body_html" => get_body_element(doc).to_xml(:indent => 0, :encoding => "UTF-8")
+  }
 end
 
 def main(argv)
