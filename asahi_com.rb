@@ -28,52 +28,16 @@ def create_logger
   return logger
 end
 
-def remove_unnecessary_elements(doc)
-  doc.xpath("//comment()").remove
-  doc.xpath("//script").remove
-  doc.xpath("//noscript").remove
-  doc.xpath("//text()").
-    select { |node| node.text.strip.empty? }.
-    each   { |node| node.remove }
-end
-
-def get_images(doc, url)
-  headline = doc.xpath('//*[@id="HeadLine"]').first
-  return headline.xpath('.//div[@class="ThmbCol"]/p').map { |parag|
-    path = parag.xpath('.//img').first[:src]
-    {
-      "url"     => URI.join(url, path).to_s,
-      "caption" => parag.xpath('./small').text.strip,
-    }
-  }
-end
-
-def get_body_element(doc)
-  headline = doc.xpath('//*[@id="HeadLine"]').first
-  body     = headline.xpath('.//div[@class="BodyTxt"]').first
-
-  # 本文のdiv要素をクリーンアップ
-  body.remove_attribute("class")
-
-  # 本文内のp要素をクリーンアップ
-  body.xpath('.//p/text()').each { |node|
-    text = node.text.strip.sub(/^　/, "")
-    node.replace(Nokogiri::XML::Text.new(text, doc))
-  }
-
-  return body
-end
-
 def parse(src, url)
   doc = Nokogiri.HTML(src)
 
-  remove_unnecessary_elements(doc)
+  $article.class.remove_unnecessary_elements(doc)
 
   return {
     "title"     => $article.class.extract_title(doc),
     "published" => $article.class.extract_published(doc),
-    "images"    => get_images(doc, url),
-    "body_html" => get_body_element(doc).to_xml(:indent => 0, :encoding => "UTF-8")
+    "images"    => $article.class.extract_images(doc, url),
+    "body_html" => $article.class.extract_body_element(doc).to_xml(:indent => 0, :encoding => "UTF-8")
   }
 end
 
