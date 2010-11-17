@@ -51,10 +51,12 @@ content_opf = <<END_OF_XML
 <?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="BookID">
  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
-  <dc:title>#{title}</dc:title>
-  <dc:creator opf:role="aut">#{author}</dc:creator>
   <dc:language>ja</dc:language>
   <dc:identifier id="BookID" opf:scheme="UUID">urn:uuid:#{uuid}</dc:identifier>
+  <dc:title>#{title}</dc:title>
+  <dc:creator opf:role="aut">#{author}</dc:creator>
+  <dc:publisher>publisher</dc:publisher>
+  <dc:date opf:event="publication">2010-03-27</dc:date>
  </metadata>
  <manifest>
   <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
@@ -116,6 +118,7 @@ END_OF_XML
 
 Zip::ZipFile.open("out.epub", Zip::ZipFile::CREATE) { |zip|
   # FIXME: mimetypeは無圧縮でなければならない
+  # FIXME: mimetypeはアーカイブの先頭に現れなければならない
   zip.get_output_stream("mimetype") { |io| io.write(mimetype) }
   zip.get_output_stream("META-INF/container.xml") { |io| io.write(container_xml) }
   zip.get_output_stream("OEBPS/content.opf") { |io| io.write(content_opf) }
