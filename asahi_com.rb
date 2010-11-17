@@ -1,6 +1,7 @@
 #! ruby -Ku
 # coding: utf-8
 
+require "uri"
 require "rubygems"
 require "log4r"
 require "nokogiri"
@@ -43,23 +44,34 @@ end
 
 def get_title(doc)
   headline = doc.xpath('//*[@id="HeadLine"]').first
-  return headline.xpath('self::*/h1[1]/text()').text.strip
+  return headline.xpath('./h1[1]/text()').text.strip
 end
 
 def get_published(doc)
   headline = doc.xpath('//*[@id="HeadLine"]').first
-  return headline.xpath('self::*/div[@class="Utility"]/p/text()').text.strip
+  return headline.xpath('./div[@class="Utility"]/p/text()').text.strip
+end
+
+def get_images(doc, url)
+  headline = doc.xpath('//*[@id="HeadLine"]').first
+  return headline.xpath('.//div[@class="ThmbCol"]/p').map { |parag|
+    path = parag.xpath('.//img').first[:src]
+    {
+      "url"     => URI.join(url, path).to_s,
+      "caption" => parag.xpath('./small').text.strip,
+    }
+  }
 end
 
 def get_body_element(doc)
   headline = doc.xpath('//*[@id="HeadLine"]').first
-  body     = headline.xpath('self::*//div[@class="BodyTxt"]').first
+  body     = headline.xpath('.//div[@class="BodyTxt"]').first
 
   # 本文のdiv要素をクリーンアップ
   body.remove_attribute("class")
 
   # 本文内のp要素をクリーンアップ
-  body.xpath('self::*//p/text()').each { |node|
+  body.xpath('.//p/text()').each { |node|
     text = node.text.strip.sub(/^　/, "")
     node.replace(Nokogiri::XML::Text.new(text, doc))
   }
@@ -68,7 +80,8 @@ def get_body_element(doc)
 end
 
 
-def parse(src)
+
+def parse(src, url)
   doc = Nokogiri.HTML(src)
   remove_unnecessary_elements(doc)
 
@@ -76,13 +89,15 @@ def parse(src)
 #  puts doc.to_xml(:indent => 1, :encoding => "UTF-8")
 
 #  puts "---"
-  title     = get_title(doc)
-  published = get_published(doc)
+  title        = get_title(doc)
+  published    = get_published(doc)
+  images       = get_images(doc, url)
   body_element = get_body_element(doc)
 
   puts "---"
   puts title
   puts published
+  p images
   puts body_element.to_xml(:indent => 1, :encoding => "UTF-8")
 
 end
@@ -91,12 +106,14 @@ def main(argv)
   logger = create_logger
   http   = create_http_client(logger)
 
-  original_url = argv[0]
-  original_src = http.get(original_url)
+  original_url  = argv[0]
+  original_src  = http.get(original_url)
   canonical_url = get_canonical_url(original_src)
   canonical_src = http.get(canonical_url)
 
-  parse(canonical_src)
+  parsed = parse(canonical_src, canonical_url)
+  require "pp"
+  pp parsed
 end
 
 main(ARGV)
