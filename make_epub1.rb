@@ -30,22 +30,8 @@ author = "generator"
 uuid   = UUID.new.generate
 
 
-mimetype = "application/epub+zip"
-
-puts "---"
-puts mimetype
-
-container_xml = <<END_OF_XML
-<?xml version="1.0" encoding="UTF-8"?>
-<container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">
- <rootfiles>
-  <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/>
- </rootfiles>
-</container>
-END_OF_XML
-
-puts "---"
-puts container_xml
+mimetype = File.open("template/mimetype", "rb") { |file| file.read }
+container_xml = File.open("template/container.xml", "rb") { |file| file.read }
 
 content_opf = <<END_OF_XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -116,6 +102,7 @@ text1_xhtml = <<END_OF_XML
 </html>
 END_OF_XML
 
+File.unlink("out.epub")
 Zip::ZipFile.open("out.epub", Zip::ZipFile::CREATE) { |zip|
   # FIXME: mimetypeは無圧縮でなければならない
   # FIXME: mimetypeはアーカイブの先頭に現れなければならない
