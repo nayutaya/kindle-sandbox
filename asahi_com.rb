@@ -1,7 +1,6 @@
 #! ruby -Ku
 # coding: utf-8
 
-require "uri"
 require "rubygems"
 require "log4r"
 
@@ -31,17 +30,17 @@ def main(argv)
   logger = create_logger
   http   = create_http_client(logger)
 
-  original_url  = argv[0]
-
-  article = AsahiCom.new(
-    :url    => original_url,
-    :http   => http,
-    :logger => logger)
-
-  parsed = article.parse
-
   require "pp"
-  pp parsed
+
+  pp AsahiCom.new(
+    :url    => "http://www.asahi.com/national/update/1116/TKY201011160485.html",
+    :http   => http).parse
+  pp AsahiCom.new(
+    :url    => "http://www.asahi.com/national/update/1115/OSK201011150139.html",
+    :http   => http).parse
+  pp AsahiCom.new(
+    :url    => "http://www.asahi.com/national/update/1117/SEB201011170005.html",
+    :http   => http).parse
 end
 
 main(ARGV)

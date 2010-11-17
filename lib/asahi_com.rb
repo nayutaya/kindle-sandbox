@@ -1,13 +1,13 @@
 # coding: utf-8
 
+require "uri"
 require "rubygems"
 require "nokogiri"
 
 class AsahiCom
   def initialize(options)
-    @url    = options.delete(:url)    || raise(ArgumentError)
-    @http   = options.delete(:http)   || raise(ArgumentError)
-    @logger = options.delete(:logger) || raise(ArgumentError)
+    @url  = options.delete(:url)  || raise(ArgumentError)
+    @http = options.delete(:http) || raise(ArgumentError)
   end
 
   def self.extract_canonical_url(doc)
@@ -77,6 +77,7 @@ class AsahiCom
     return @_canonical_html
   end
 
+  # FIXME: 複数ページを考慮する
   def parse
     url  = self.get_canonical_url
     html = self.read_canonical_url
