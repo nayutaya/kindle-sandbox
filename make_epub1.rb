@@ -1,6 +1,10 @@
 #! ruby -Ku
 # coding: utf-8
 
+require "rubygems"
+require "uuid"
+require "zip/zip"
+
 =begin
 
 ディレクトリ構成
@@ -21,6 +25,11 @@
 
 =end
 
+mimetype = "application/epub+zip"
+
+puts "---"
+puts mimetype
+
 container_xml = <<END_OF_XML
 <?xml version="1.0"?>
 <container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">
@@ -30,16 +39,19 @@ container_xml = <<END_OF_XML
 </container>
 END_OF_XML
 
-p container_xml
+puts "---"
+puts container_xml
 
-=begin
+uuid = UUID.new.generate
+
+content_opf = <<END_OF_XML
 <?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="BookID">
  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
   <dc:title>Design Sample!!!</dc:title>
   <dc:creator opf:role="aut">Yuya Kato!!!</dc:creator>
   <dc:language>ja</dc:language>
-  <dc:identifier id="BookID" opf:scheme="UUID">urn:uuid:3574e515-9d78-4fc8-a728-2e55db905413!!!</dc:identifier>
+  <dc:identifier id="BookID" opf:scheme="UUID">urn:uuid:#{uuid}</dc:identifier>
  </metadata>
  <manifest>
   <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
@@ -51,4 +63,14 @@ p container_xml
   <itemref idref="text1" />
  </spine>
 </package>
-=end
+END_OF_XML
+
+puts "---"
+puts content_opf
+
+
+Zip::ZipFile.open("out.zip", Zip::ZipFile::CREATE) { |zip|
+  zip.get_output_stream("mimetype") { |io| io.write(mimetype) }
+  zip.get_output_stream("META-INF/container.xml") { |io| io.write(container_xml) }
+  zip.get_output_stream("OEBPS/content.opf") { |io| io.write(content_opf) }
+}
