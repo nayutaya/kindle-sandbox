@@ -6,9 +6,10 @@ require "rubygems"
 require "zip/zip"
 
 Zip::ZipFile.open("test.zip", Zip::ZipFile::CREATE) { |zip|
-  #zip.add("mimetype", "hoge")
   zip.get_output_stream("mimetype") { |io|
-p io
     io.write("application/epub+zip")
+  }
+  zip.get_output_stream("foo/bar") { |io|
+    io.write("baz")
   }
 }
