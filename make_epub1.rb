@@ -1,6 +1,8 @@
 #! ruby -Ku
 # coding: utf-8
 
+require "cgi"
+require "erb"
 require "rubygems"
 require "uuid"
 require "zip/zip"
@@ -31,12 +33,11 @@ author = "generator"
 publisher = "publisher"
 
 
-mimetype      = File.open("template/mimetype", "rb") { |file| file.read }
-container_xml = File.open("template/container.xml", "rb") { |file| file.read }
-content_opf   = File.open("template/content.opf.erb", "rb") { |file| file.read }
+mimetype        = File.open("template/mimetype",        "rb") { |file| file.read }
+container_xml   = File.open("template/container.xml",   "rb") { |file| file.read }
+content_opf_erb = File.open("template/content.opf.erb", "rb") { |file| file.read }
+toc_ncx_erb     = File.open("template/toc.ncx.erb",     "rb") { |file| file.read }
 
-require "cgi"
-require "erb"
 
 
 env = Object.new.instance_eval {
@@ -53,42 +54,23 @@ env = Object.new.instance_eval {
   binding
 }
 
-content_opf = ERB.new(content_opf, nil, "-").result(env)
+content_opf = ERB.new(content_opf_erb, nil, "-").result(env)
 
 =begin
   <item id="image1" href="images/image1.png" media-type="image/png"/>
   <item id="style1" href="styles/style1.css" media-type="text/css"/>
 =end
 
-puts "---"
-puts content_opf
-
-toc_ncx = <<END_OF_XML
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE ncx PUBLIC "-//NISO//DTD ncx 2005-1//EN" "http://www.daisy.org/z3986/2005/ncx-2005-1.dtd">
-<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
- <head>
-  <meta name="dtb:uid" content="#{uuid}"/>
-  <meta name="dtb:depth" content="1"/>
-  <meta name="dtb:totalPageCount" content="0"/>
-  <meta name="dtb:maxPageNumber" content="0"/>
- </head>
- <docTitle>
-  <text>#{title}</text>
- </docTitle>
- <docAuthor>
-  <text>#{author}</text>
- </docAuthor>
- <navMap>
-  <navPoint id="navPoint-1" playOrder="1">
-   <navLabel>
-    <text>contents</text>
-   </navLabel>
-   <content src="text/text1.xhtml"/>
-  </navPoint>
- </navMap>
-</ncx>
-END_OF_XML
+env = Object.new.instance_eval {
+  @uuid      = CGI.escapeHTML(uuid)
+  @title     = CGI.escapeHTML(title)
+  @author    = CGI.escapeHTML(author)
+  @nav_points = [
+    {:label_text => "contents", :content_src => "text/text1.xhtml"},
+  ]
+  binding
+}
+toc_ncx = ERB.new(toc_ncx_erb, nil, "-").result(env)
 
 text1_xhtml = <<END_OF_XML
 <?xml version="1.0" encoding="UTF-8"?>
