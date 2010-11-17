@@ -10,10 +10,8 @@ class AsahiCom
     @logger = options.delete(:logger) || raise(ArgumentError)
   end
 
-  def self.extract_canonical_url(html)
-    doc = Nokogiri.HTML(html)
-    url = doc.xpath("/html/head/link[@rel='canonical']").first[:href]
-    return url
+  def self.extract_canonical_url(doc)
+    return doc.xpath("/html/head/link[@rel='canonical']").first[:href]
   end
 
   def self.remove_unnecessary_elements(doc)
@@ -65,12 +63,32 @@ class AsahiCom
   end
 
   def get_canonical_url
-    @_canonical_url ||= self.class.extract_canonical_url(self.read_original_url)
+    @_canonical_url ||=
+      begin
+        html = self.read_original_url
+        doc  = Nokogiri.HTML(html)
+        self.class.extract_canonical_url(doc)
+      end
     return @_canonical_url
   end
 
   def read_canonical_url
     @_canonical_html ||= @http.get(self.get_canonical_url)
     return @_canonical_html
+  end
+
+  def parse
+    url  = self.get_canonical_url
+    html = self.read_canonical_url
+    doc  = Nokogiri.HTML(html)
+
+    self.class.remove_unnecessary_elements(doc)
+
+    return {
+      "title"     => self.class.extract_title(doc),
+      "published" => self.class.extract_published(doc),
+      "images"    => self.class.extract_images(doc, url),
+      "body_html" => self.class.extract_body_element(doc).to_xml(:indent => 0, :encoding => "UTF-8")
+    }
   end
 end

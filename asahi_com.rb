@@ -4,7 +4,6 @@
 require "uri"
 require "rubygems"
 require "log4r"
-require "nokogiri"
 
 $: << File.join(File.dirname(__FILE__), "lib")
 require "http/factory"
@@ -28,34 +27,19 @@ def create_logger
   return logger
 end
 
-def parse(src, url)
-  doc = Nokogiri.HTML(src)
-
-  $article.class.remove_unnecessary_elements(doc)
-
-  return {
-    "title"     => $article.class.extract_title(doc),
-    "published" => $article.class.extract_published(doc),
-    "images"    => $article.class.extract_images(doc, url),
-    "body_html" => $article.class.extract_body_element(doc).to_xml(:indent => 0, :encoding => "UTF-8")
-  }
-end
-
 def main(argv)
   logger = create_logger
   http   = create_http_client(logger)
 
   original_url  = argv[0]
 
-  $article = AsahiCom.new(
+  article = AsahiCom.new(
     :url    => original_url,
     :http   => http,
     :logger => logger)
 
-  canonical_url = $article.get_canonical_url
-  canonical_src = $article.read_canonical_url
+  parsed = article.parse
 
-  parsed = parse(canonical_src, canonical_url)
   require "pp"
   pp parsed
 end
