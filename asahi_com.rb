@@ -41,10 +41,50 @@ def remove_unnecessary_elements(doc)
     each   { |node| node.remove }
 end
 
+def get_title(doc)
+  headline = doc.xpath('//*[@id="HeadLine"]').first
+  return headline.xpath('self::*/h1[1]/text()').text.strip
+end
+
+def get_published(doc)
+  headline = doc.xpath('//*[@id="HeadLine"]').first
+  return headline.xpath('self::*/div[@class="Utility"]/p/text()').text.strip
+end
+
+def get_body_element(doc)
+  headline = doc.xpath('//*[@id="HeadLine"]').first
+  body     = headline.xpath('self::*//div[@class="BodyTxt"]').first
+
+  # 本文のdiv要素をクリーンアップ
+  body.remove_attribute("class")
+
+  # 本文内のp要素をクリーンアップ
+  body.xpath('self::*//p/text()').each { |node|
+    text = node.text.strip.sub(/^　/, "")
+    node.replace(Nokogiri::XML::Text.new(text, doc))
+  }
+
+  return body
+end
+
+
 def parse(src)
   doc = Nokogiri.HTML(src)
   remove_unnecessary_elements(doc)
-puts doc.to_xml(:indent => 1, :encoding => "UTF-8")
+
+#  puts "---"
+#  puts doc.to_xml(:indent => 1, :encoding => "UTF-8")
+
+#  puts "---"
+  title     = get_title(doc)
+  published = get_published(doc)
+  body_element = get_body_element(doc)
+
+  puts "---"
+  puts title
+  puts published
+  puts body_element.to_xml(:indent => 1, :encoding => "UTF-8")
+
 end
 
 def main(argv)
