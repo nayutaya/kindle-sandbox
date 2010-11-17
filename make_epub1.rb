@@ -25,38 +25,40 @@ require "zip/zip"
 
 =end
 
+uuid   = UUID.new.generate
 title  = "autogen " + Time.now.strftime("%Y%m%d%H%M%S")
 author = "generator"
-uuid   = UUID.new.generate
+publisher = "publisher"
 
 
-mimetype = File.open("template/mimetype", "rb") { |file| file.read }
+mimetype      = File.open("template/mimetype", "rb") { |file| file.read }
 container_xml = File.open("template/container.xml", "rb") { |file| file.read }
+content_opf   = File.open("template/content.opf.erb", "rb") { |file| file.read }
 
-content_opf = <<END_OF_XML
-<?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="BookID">
- <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
-  <dc:language>ja</dc:language>
-  <dc:identifier id="BookID" opf:scheme="UUID">urn:uuid:#{uuid}</dc:identifier>
-  <dc:title>#{title}</dc:title>
-  <dc:creator opf:role="aut">#{author}</dc:creator>
-  <dc:publisher>publisher</dc:publisher>
-  <dc:date opf:event="publication">2010-03-27</dc:date>
- </metadata>
- <manifest>
-  <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
-  <item id="text1" href="text/text1.xhtml" media-type="application/xhtml+xml"/>
-<!--
+require "cgi"
+require "erb"
+
+
+env = Object.new.instance_eval {
+  @uuid      = CGI.escapeHTML(uuid)
+  @title     = CGI.escapeHTML(title)
+  @author    = CGI.escapeHTML(author)
+  @publisher = CGI.escapeHTML(publisher)
+  @items     = [
+    {:id => "text1", :href => "text/text1.xhtml", :type => "application/xhtml+xml"},
+  ]
+  @itemrefs  = [
+    {:idref => "text1"},
+  ]
+  binding
+}
+
+content_opf = ERB.new(content_opf, nil, "-").result(env)
+
+=begin
   <item id="image1" href="images/image1.png" media-type="image/png"/>
   <item id="style1" href="styles/style1.css" media-type="text/css"/>
--->
- </manifest>
- <spine toc="ncx">
-  <itemref idref="text1"/>
- </spine>
-</package>
-END_OF_XML
+=end
 
 puts "---"
 puts content_opf
