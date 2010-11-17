@@ -9,6 +9,7 @@ require "nokogiri"
 $: << File.join(File.dirname(__FILE__), "lib")
 require "http/factory"
 require "http/message_pack_store"
+require "lib/asahi_com"
 
 def create_http_client(logger)
   store = HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "cache"))
@@ -25,12 +26,6 @@ def create_logger
   logger.add(outputter)
   logger.level = Log4r::DEBUG
   return logger
-end
-
-def get_canonical_url(src)
-  doc = Nokogiri.HTML(src)
-  url = doc.xpath("/html/head/link[@rel='canonical']").first[:href]
-  return url
 end
 
 def remove_unnecessary_elements(doc)
@@ -97,9 +92,17 @@ def main(argv)
   http   = create_http_client(logger)
 
   original_url  = argv[0]
-  original_src  = http.get(original_url)
-  canonical_url = get_canonical_url(original_src)
+
+  article = AsahiCom.new(
+    :url    => original_url,
+    :http   => http,
+    :logger => logger)
+p article
+
+  #original_src  = http.get(original_url)
+  canonical_url = article.get_canonical_url_from_url(original_url)
   canonical_src = http.get(canonical_url)
+
 
   parsed = parse(canonical_src, canonical_url)
   require "pp"
