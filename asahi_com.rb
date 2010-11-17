@@ -37,16 +37,6 @@ def remove_unnecessary_elements(doc)
     each   { |node| node.remove }
 end
 
-def get_title(doc)
-  headline = doc.xpath('//*[@id="HeadLine"]').first
-  return headline.xpath('./h1[1]/text()').text.strip
-end
-
-def get_published(doc)
-  headline = doc.xpath('//*[@id="HeadLine"]').first
-  return headline.xpath('./div[@class="Utility"]/p/text()').text.strip
-end
-
 def get_images(doc, url)
   headline = doc.xpath('//*[@id="HeadLine"]').first
   return headline.xpath('.//div[@class="ThmbCol"]/p').map { |parag|
@@ -80,8 +70,8 @@ def parse(src, url)
   remove_unnecessary_elements(doc)
 
   return {
-    "title"     => get_title(doc),
-    "published" => get_published(doc),
+    "title"     => $article.class.extract_title(doc),
+    "published" => $article.class.extract_published(doc),
     "images"    => get_images(doc, url),
     "body_html" => get_body_element(doc).to_xml(:indent => 0, :encoding => "UTF-8")
   }
@@ -93,16 +83,13 @@ def main(argv)
 
   original_url  = argv[0]
 
-  article = AsahiCom.new(
+  $article = AsahiCom.new(
     :url    => original_url,
     :http   => http,
     :logger => logger)
-p article
 
-  #original_src  = http.get(original_url)
-  canonical_url = article.get_canonical_url_from_url(original_url)
-  canonical_src = http.get(canonical_url)
-
+  canonical_url = $article.get_canonical_url
+  canonical_src = $article.read_canonical_url
 
   parsed = parse(canonical_src, canonical_url)
   require "pp"
