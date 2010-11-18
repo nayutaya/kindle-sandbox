@@ -86,6 +86,7 @@ class AsahiCom
     self.class.remove_unnecessary_elements(doc)
 
     return {
+      "url"       => url,
       "title"     => self.class.extract_title(doc),
       "published" => self.class.extract_published(doc),
       "images"    => self.class.extract_images(doc, url),

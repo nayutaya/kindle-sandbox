@@ -39,19 +39,12 @@ title     = manifest["title"]     || Time.now.strftime("%Y-%m-%d %H:%M:%S")
 author    = manifest["author"]    || "Unknown"
 publisher = manifest["publisher"] || nil
 
-p manifest
-exit
-
-article = AsahiCom.new(:url => "http://www.asahi.com/national/update/1116/TKY201011160485.html", :http => http).parse
-asahi_com_xhtml_erb = File.open("template/asahi_com.xhtml.erb",     "rb") { |file| file.read }
-
-env = Object.new.instance_eval {
-  @title = CGI.escapeHTML(article["title"])
-  @body  = article["body_html"]
-  binding
+articles = manifest["urls"].each_with_index.map { |url, index|
+  article = AsahiCom.new(:url => url, :http => http).parse
+  article.merge(
+    "id"       => "text#{index + 1}",
+    "filename" => "text/text#{index + 1}.xhtml")
 }
-asahi_com_xhtml = ERB.new(asahi_com_xhtml_erb, nil, "-").result(env)
-
 
 
 
@@ -59,6 +52,7 @@ mimetype        = File.open("template/mimetype",        "rb") { |file| file.read
 container_xml   = File.open("template/container.xml",   "rb") { |file| file.read }
 content_opf_erb = File.open("template/content.opf.erb", "rb") { |file| file.read }
 toc_ncx_erb     = File.open("template/toc.ncx.erb",     "rb") { |file| file.read }
+asahi_com_xhtml_erb = File.open("template/asahi_com.xhtml.erb", "rb") { |file| file.read }
 
 
 
@@ -67,12 +61,12 @@ env = Object.new.instance_eval {
   @title     = CGI.escapeHTML(title)
   @author    = CGI.escapeHTML(author)
   @publisher = CGI.escapeHTML(publisher)
-  @items     = [
-    {:id => "text1", :href => "text/text1.xhtml", :type => "application/xhtml+xml"},
-  ]
-  @itemrefs  = [
-    {:idref => "text1"},
-  ]
+  @items     = articles.map { |article|
+    {:id => article["id"], :href => article["filename"], :type => "application/xhtml+xml"}
+  }
+  @itemrefs  = articles.map { |article|
+    {:idref => article["id"]}
+  }
   binding
 }
 
@@ -87,12 +81,25 @@ env = Object.new.instance_eval {
   @uuid      = CGI.escapeHTML(uuid)
   @title     = CGI.escapeHTML(title)
   @author    = CGI.escapeHTML(author)
-  @nav_points = [
-    {:label_text => "contents", :content_src => "text/text1.xhtml"},
-  ]
+  @nav_points = articles.map { |article|
+    {:label_text => article["title"], :content_src => article["filename"]}
+  }
   binding
 }
 toc_ncx = ERB.new(toc_ncx_erb, nil, "-").result(env)
+
+docs = articles.map { |article|
+  env = Object.new.instance_eval {
+    @title = CGI.escapeHTML(article["title"])
+    @url   = CGI.escapeHTML(article["url"])
+    @body  = article["body_html"]
+    binding
+  }
+  {
+    "filename" => "OEBPS/" + article["filename"],
+    "xhtml"    => ERB.new(asahi_com_xhtml_erb, nil, "-").result(env),
+  }
+}
 
 filename = "epub2.epub"
 File.unlink(filename) if File.exist?(filename)
@@ -103,5 +110,7 @@ Zip::ZipFile.open(filename, Zip::ZipFile::CREATE) { |zip|
   zip.get_output_stream("META-INF/container.xml") { |io| io.write(container_xml) }
   zip.get_output_stream("OEBPS/content.opf") { |io| io.write(content_opf) }
   zip.get_output_stream("OEBPS/toc.ncx") { |io| io.write(toc_ncx) }
-  zip.get_output_stream("OEBPS/text/text1.xhtml") { |io| io.write(asahi_com_xhtml) }
+  docs.each { |doc|
+    zip.get_output_stream(doc["filename"]) { |io| io.write(doc["xhtml"]) }
+  }
 }
