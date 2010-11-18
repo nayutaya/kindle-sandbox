@@ -9,6 +9,15 @@
  <body>
   <h1><%= @title %></h1>
   <div id="original-link"><a href="<%= @url %>">原文へ</a></div>
+  <%- unless @images.empty? -%>
+   <hr/>
+   <%- @images.each { |filename, caption| -%>
+    <div>
+     <div class="image"><img src="<%= filename %>"/></div>
+     <div class="caption"><%= caption %></div>
+    </div>
+   <%- } -%>
+  <%- end -%>
   <hr/>
   <div id="body">
    <%= @body %>

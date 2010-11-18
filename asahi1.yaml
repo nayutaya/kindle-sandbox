@@ -1,9 +1,9 @@
 ---
-title: "スクラップ1.3"
-author: "autogen"
+title: "スクラップ1.4"
+author: "朝日新聞"
 publisher: "朝日新聞"
 uuid: null
 urls:
-  - "http://www.asahi.com/national/update/1116/TKY201011160485.html"
-  - "http://www.asahi.com/national/update/1115/OSK201011150139.html"
-  - "http://www.asahi.com/national/update/1117/SEB201011170005.html"
+  - "http://www.asahi.com/national/update/1116/OSK201011150172.html?ref=rss"
+  - "http://www.asahi.com/international/update/1115/TKY201011150350.html?ref=rss"
+  - "http://www.asahi.com/science/update/1116/TKY201011160087.html?ref=rss"
