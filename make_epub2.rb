@@ -101,10 +101,11 @@ toc_ncx = ERB.new(toc_ncx_erb, nil, "-").result(env)
 
 docs = articles.map { |article|
   env = Object.new.instance_eval {
-    @title  = CGI.escapeHTML(article["title"])
-    @url    = CGI.escapeHTML(article["url"])
-    @body   = article["body_html"]
-    @images = article["images"].map { |image| [CGI.escapeHTML("../" + image["filename"]), CGI.escapeHTML(image["caption"])] }
+    @url       = CGI.escapeHTML(article["url"])
+    @title     = CGI.escapeHTML(article["title"])
+    @published = CGI.escapeHTML(article["published"])
+    @body      = article["body_html"]
+    @images    = article["images"].map { |image| [CGI.escapeHTML("../" + image["filename"]), CGI.escapeHTML(image["caption"])] }
     binding
   }
   {

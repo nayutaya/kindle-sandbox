@@ -8,7 +8,10 @@
  </head>
  <body>
   <h1><%= @title %></h1>
-  <div id="original-link"><a href="<%= @url %>">原文へ</a></div>
+  <div id="published">
+   <%= @published %>
+   <a href="<%= @url %>">原文へ</a>
+  </div>
   <%- unless @images.empty? -%>
    <hr/>
    <%- @images.each { |filename, caption| -%>
