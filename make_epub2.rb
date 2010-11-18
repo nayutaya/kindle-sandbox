@@ -62,8 +62,10 @@ content_opf_erb = File.open("template/content.opf.erb", "rb") { |file| file.read
 toc_ncx_erb     = File.open("template/toc.ncx.erb",     "rb") { |file| file.read }
 asahi_com_xhtml_erb = File.open("template/asahi_com.xhtml.erb", "rb") { |file| file.read }
 asahi_com_css   = File.open("template/asahi_com.css",   "rb") { |file| file.read }
+toc_xhtml_erb   = File.open("template/asahi_com_toc.xhtml.erb", "rb") { |file| file.read }
 
 opf_items = [
+  {:id => "toc", :href => "toc.xhtml", :type => "application/xhtml+xml"},
   {:id => "style1", :href => "styles/asahi_com.css", :type => "text/css"},
 ]
 articles.each { |article|
@@ -73,15 +75,16 @@ articles.each { |article|
   }
 }
 
+opf_itemrefs = [{:idref => "toc"}]
+opf_itemrefs += articles.map { |article| {:idref => article["id"]} }
+
 env = Object.new.instance_eval {
   @uuid      = CGI.escapeHTML(uuid)
   @title     = CGI.escapeHTML(title)
   @author    = CGI.escapeHTML(author)
   @publisher = CGI.escapeHTML(publisher)
   @items     = opf_items
-  @itemrefs  = articles.map { |article|
-    {:idref => article["id"]}
-  }
+  @itemrefs  = opf_itemrefs
   binding
 }
 content_opf = ERB.new(content_opf_erb, nil, "-").result(env)
@@ -97,6 +100,14 @@ env = Object.new.instance_eval {
   binding
 }
 toc_ncx = ERB.new(toc_ncx_erb, nil, "-").result(env)
+
+env = Object.new.instance_eval {
+  @articles = articles.map { |article|
+    [CGI.escapeHTML(article["title"]), CGI.escapeHTML(article["filename"])]
+  }
+  binding
+}
+toc_xhtml = ERB.new(toc_xhtml_erb, nil, "-").result(env)
 
 
 docs = articles.map { |article|
@@ -123,6 +134,7 @@ Zip::ZipFile.open(filename, Zip::ZipFile::CREATE) { |zip|
   zip.get_output_stream("META-INF/container.xml") { |io| io.write(container_xml) }
   zip.get_output_stream("OEBPS/content.opf") { |io| io.write(content_opf) }
   zip.get_output_stream("OEBPS/toc.ncx") { |io| io.write(toc_ncx) }
+  zip.get_output_stream("OEBPS/toc.xhtml") { |io| io.write(toc_xhtml) }
   docs.each { |doc|
     zip.get_output_stream(doc["filename"]) { |io| io.write(doc["xhtml"]) }
   }
