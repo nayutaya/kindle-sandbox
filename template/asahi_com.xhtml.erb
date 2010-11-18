@@ -4,11 +4,14 @@
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title><%= @title %></title>
+  <link rel="stylesheet" type="text/css" href="../styles/asahi_com.css" media="all" />
  </head>
  <body>
   <h1><%= @title %></h1>
-  <div><a href="<%= @url %>">原文</a></div>
+  <div id="original-link"><a href="<%= @url %>">原文へ</a></div>
   <hr/>
-  <%= @body %>
+  <div id="body">
+   <%= @body %>
+  </div>
  </body>
 </html>

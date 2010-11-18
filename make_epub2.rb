@@ -53,7 +53,7 @@ container_xml   = File.open("template/container.xml",   "rb") { |file| file.read
 content_opf_erb = File.open("template/content.opf.erb", "rb") { |file| file.read }
 toc_ncx_erb     = File.open("template/toc.ncx.erb",     "rb") { |file| file.read }
 asahi_com_xhtml_erb = File.open("template/asahi_com.xhtml.erb", "rb") { |file| file.read }
-
+asahi_com_css   = File.open("template/asahi_com.css",   "rb") { |file| file.read }
 
 
 env = Object.new.instance_eval {
@@ -63,7 +63,9 @@ env = Object.new.instance_eval {
   @publisher = CGI.escapeHTML(publisher)
   @items     = articles.map { |article|
     {:id => article["id"], :href => article["filename"], :type => "application/xhtml+xml"}
-  }
+  } + [
+    {:id => "style1", :href => "styles/asahi_com.css", :type => "text/css"},
+  ]
   @itemrefs  = articles.map { |article|
     {:idref => article["id"]}
   }
@@ -113,4 +115,5 @@ Zip::ZipFile.open(filename, Zip::ZipFile::CREATE) { |zip|
   docs.each { |doc|
     zip.get_output_stream(doc["filename"]) { |io| io.write(doc["xhtml"]) }
   }
+  zip.get_output_stream("OEBPS/styles/asahi_com.css") { |io| io.write(asahi_com_css) }
 }
