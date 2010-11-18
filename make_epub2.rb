@@ -3,7 +3,7 @@
 
 require "cgi"
 require "erb"
-
+require "yaml"
 require "rubygems"
 require "uuid"
 require "zip/zip"
@@ -33,6 +33,15 @@ end
 logger = create_logger
 http   = create_http_client(logger)
 
+manifest = YAML.load_file("asahi1.yaml")
+uuid      = manifest["uuid"]      || UUID.new.generate
+title     = manifest["title"]     || Time.now.strftime("%Y-%m-%d %H:%M:%S")
+author    = manifest["author"]    || "Unknown"
+publisher = manifest["publisher"] || nil
+
+p manifest
+exit
+
 article = AsahiCom.new(:url => "http://www.asahi.com/national/update/1116/TKY201011160485.html", :http => http).parse
 asahi_com_xhtml_erb = File.open("template/asahi_com.xhtml.erb",     "rb") { |file| file.read }
 
@@ -44,10 +53,6 @@ env = Object.new.instance_eval {
 asahi_com_xhtml = ERB.new(asahi_com_xhtml_erb, nil, "-").result(env)
 
 
-uuid   = UUID.new.generate
-title  = "autogen " + Time.now.strftime("%Y%m%d%H%M%S")
-author = "generator"
-publisher = "publisher"
 
 
 mimetype        = File.open("template/mimetype",        "rb") { |file| file.read }
