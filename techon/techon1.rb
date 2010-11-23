@@ -42,6 +42,23 @@ def extract_title(src)
   return title
 end
 
+def extract_published_date(src)
+  doc  = Nokogiri.HTML(src)
+  date = doc.xpath('//*[@id="kijiBox"]/div[@class="topTitleMenu"]/div[@class="date"]/text()').text.strip
+  return date
+end
+
+def extract_images(src, url)
+  doc  = Nokogiri.HTML(src)
+  divs = doc.xpath('//*[@id="kiji"]/div[@class="bpbox_right"]/div[@class="bpimage_set"]')
+  return divs.map { |div|
+    path    = div.xpath('./div[@class="bpimage_image"]//img').first[:src]
+    url     = URI.join(url, path).to_s
+    caption = div.xpath('./div[@class="bpimage_caption"]//text()').text.strip
+    {"url" => url, "caption" => caption}
+  }
+end
+
 def extract_body_html(src, url)
   doc = Nokogiri.HTML(src)
 
@@ -74,23 +91,15 @@ def extract_body_html(src, url)
   return body.to_xml(:indent => 0, :encoding => "UTF-8")
 end
 
-def extract_images(src, url)
-  doc  = Nokogiri.HTML(src)
-  divs = doc.xpath('//*[@id="kiji"]/div[@class="bpbox_right"]/div[@class="bpimage_set"]')
-  return divs.map { |div|
-    path    = div.xpath('./div[@class="bpimage_image"]//img').first[:src]
-    url     = URI.join(url, path).to_s
-    caption = div.xpath('./div[@class="bpimage_caption"]//text()').text.strip
-    {"url" => url, "caption" => caption}
-  }
-end
-
 
 require "pp"
 
 
 puts "---"
 pp title = extract_title(src1)
+
+puts "---"
+pp published_date = extract_published_date(src1)
 
 puts "---"
 pp images = extract_images(src1, url1)
