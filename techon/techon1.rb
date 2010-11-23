@@ -10,6 +10,7 @@ require "http/factory"
 require "http/message_pack_store"
 
 require "article_page_parser"
+require "article_formatter"
 
 def create_http_client(logger)
   store = HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "..", "cache"))
@@ -29,25 +30,7 @@ def create_logger
 end
 
 
-require "erb"
-
-filename = File.join(File.dirname(__FILE__), "template.xhtml.erb")
-template = File.open(filename, "rb") { |file| file.read }
-
-env = Object.new
-env.extend(ERB::Util)
-env.instance_eval {
-  @url            = "http://foo.bar.baz/"
-  @title          = "てすと"
-  @published_time = Time.now
-  @author         = "さくしゃ"
-  @images         = []
-  @body           = "foo <b>bar</b> baz"
-}
-erb = ERB.new(template, nil, "-")
-erb.filename = filename
-xhtml = erb.result(env.instance_eval { binding })
-
+xhtml = TechOn::ArticleFormatter.format({})
 puts xhtml
 
 exit(1)
