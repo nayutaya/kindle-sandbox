@@ -29,6 +29,30 @@ def create_logger
 end
 
 
+require "erb"
+
+filename = File.join(File.dirname(__FILE__), "template.xhtml.erb")
+template = File.open(filename, "rb") { |file| file.read }
+
+env = Object.new
+env.extend(ERB::Util)
+env.instance_eval {
+  @url            = "http://foo.bar.baz/"
+  @title          = "てすと"
+  @published_time = Time.now
+  @author         = "さくしゃ"
+  @images         = []
+  @body           = "foo <b>bar</b> baz"
+}
+erb = ERB.new(template, nil, "-")
+erb.filename = filename
+xhtml = erb.result(env.instance_eval { binding })
+
+puts xhtml
+
+exit(1)
+
+
 logger = create_logger
 http   = create_http_client(logger)
 
