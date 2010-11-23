@@ -11,12 +11,12 @@ module TechOn
       env = Object.new
       env.extend(ERB::Util)
       env.instance_eval {
-        @url            = "http://foo.bar.baz/"
-        @title          = "てすと"
-        @published_time = Time.now
-        @author         = "さくしゃ"
-        @images         = []
-        @body           = "foo <b>bar</b> baz"
+        @url            = article["url"]
+        @title          = article["title"]
+        @published_time = article["published_time"]
+        @author         = article["author"]
+        @images         = article["images"]
+        @body           = article["body"]
       }
 
       erb = ERB.new(template, nil, "-")

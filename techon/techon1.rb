@@ -29,13 +29,6 @@ def create_logger
   return logger
 end
 
-
-xhtml = TechOn::ArticleFormatter.format({})
-puts xhtml
-
-exit(1)
-
-
 logger = create_logger
 http   = create_http_client(logger)
 
@@ -50,6 +43,8 @@ src1 = http.get(url1)
 puts "---"
 pp article = TechOn::ArticlePageParser.extract(src1, url1)
 
+xhtml = TechOn::ArticleFormatter.format(article)
+
 File.open("out.html", "wb") { |file|
-  file.puts(article["body"])
+  file.puts(xhtml)
 }

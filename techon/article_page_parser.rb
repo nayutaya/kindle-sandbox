@@ -8,6 +8,7 @@ module TechOn
   module TechOn::ArticlePageParser
     def self.extract(src, url)
       return {
+        "url"            => url,
         "title"          => self.extract_title(src),
         "published_time" => self.extract_published_time(src),
         "author"         => self.extract_author(src),
