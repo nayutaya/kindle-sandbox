@@ -6,16 +6,30 @@ require "nokogiri"
 
 module TechOn
   module TechOn::ArticlePageParser
+    def self.extract(src, url)
+      return {
+        "title"          => self.extract_title(src),
+        "published_time" => self.extract_published_time(src),
+        "author"         => self.extract_author(src),
+        "images"         => self.extract_images(src, url),
+        "body"           => self.extract_body(src, url),
+      }
+    end
+
     def self.extract_title(src)
       doc   = Nokogiri.HTML(src)
       title = doc.xpath('//*[@id="kijiBox"]/h1/text()').text.strip
       return title
     end
 
-    def self.extract_published_date(src)
+    def self.extract_published_time(src)
       doc  = Nokogiri.HTML(src)
-      date = doc.xpath('//*[@id="kijiBox"]/div[@class="topTitleMenu"]/div[@class="date"]/text()').text.strip
-      return date
+      time = doc.xpath('//*[@id="kijiBox"]/div[@class="topTitleMenu"]/div[@class="date"]/text()').text.strip
+      if /\A(\d\d\d\d)\/(\d\d)\/(\d\d) (\d\d):(\d\d)\z/ =~ time
+        return Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
+      else
+        return nil
+      end
     end
 
     def self.extract_author(src)
@@ -35,7 +49,7 @@ module TechOn
       }
     end
 
-    def self.extract_body_html(src, url)
+    def self.extract_body(src, url)
       doc = Nokogiri.HTML(src)
 
       # 全体の不要な要素を削除
@@ -52,7 +66,7 @@ module TechOn
       body.remove_attribute("id")
       # 本文内の不要なdiv要素を削除
       body.xpath('./div[@class="bpbox_right"]').remove
-      # 本文内のp要素をクリーンアップ
+      # 本文内のp要素のテキストをクリーンアップ
       body.xpath('.//p/text()').each { |node|
         text = node.text.strip.sub(/^　/, "")
         node.replace(Nokogiri::XML::Text.new(text, doc))
