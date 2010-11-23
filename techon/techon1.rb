@@ -36,15 +36,51 @@ url1 = "http://techon.nikkeibp.co.jp/article/NEWS/20101111/187322/?ref=rss"
 url1 = "http://techon.nikkeibp.co.jp/article/NEWS/20101116/187415/?ref=rss"
 url1 = "http://techon.nikkeibp.co.jp/article/TOPCOL/20101115/187385/?ref=rss"
 url1 = "http://techon.nikkeibp.co.jp/article/NEWS/20101116/187442/?ref=rss"
-src1 = http.get(url1)
 #puts src1
 
+require "digest/md5"
+
+module TechOn
+  module Article
+    def self.get(http, url)
+      curl    = self.get_canonical_url(url)
+      src     = http.get(curl)
+      article = TechOn::ArticlePageParser.extract(src, curl)
+
+      article["images"].each { |image|
+        image["file"]     = http.get(image["url"])
+        image["filename"] =
+          case image["url"]
+          when /\.jpg$/i then Digest::MD5.hexdigest(image["url"]) + ".jpg"
+          else raise("unknown type")
+          end
+      }
+
+      article["file"]     = TechOn::ArticleFormatter.format(article)
+      article["filename"] = Digest::MD5.hexdigest(article["url"]) + ".xhtml"
+
+      return article
+    end
+
+    def self.get_canonical_url(url)
+      return $1 if /\A(.+)\?ref=rss\z/ =~ url
+      return url
+    end
+  end
+end
+
+
+article = TechOn::Article.get(http, url1)
 
 puts "---"
-pp article = TechOn::ArticlePageParser.extract(src1, url1)
-
-xhtml = TechOn::ArticleFormatter.format(article)
+pp article
 
 File.open("out.html", "wb") { |file|
-  file.puts(xhtml)
+  file.puts(article["file"])
+}
+
+article["images"].each { |image|
+  File.open(image["filename"], "wb") { |file|
+    file.write(image["file"])
+  }
 }
