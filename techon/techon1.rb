@@ -48,6 +48,12 @@ def extract_published_date(src)
   return date
 end
 
+def extract_author(src)
+  doc    = Nokogiri.HTML(src)
+  author = doc.xpath('//*[@id="kijiBox"]/div[@class="topTitleMenu"]/div[@class="author"]/text()').text.strip
+  return author
+end
+
 def extract_images(src, url)
   doc  = Nokogiri.HTML(src)
   divs = doc.xpath('//*[@id="kiji"]/div[@class="bpbox_right"]/div[@class="bpimage_set"]')
@@ -100,6 +106,9 @@ pp title = extract_title(src1)
 
 puts "---"
 pp published_date = extract_published_date(src1)
+
+puts "---"
+pp author = extract_author(src1)
 
 puts "---"
 pp images = extract_images(src1, url1)
