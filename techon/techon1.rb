@@ -9,7 +9,7 @@ $: << File.join(File.dirname(__FILE__), "..", "lib")
 require "http/factory"
 require "http/message_pack_store"
 
-require "techon"
+require "article_page_parser"
 
 def create_http_client(logger)
   store = HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "..", "cache"))
