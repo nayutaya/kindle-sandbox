@@ -3,5 +3,6 @@
 KINDLEGEN = "kindlegen"
 
 rule ".azw" => ".epub" do |t|
-  sh %|#{KINDLEGEN} "#{t.prerequisites.first}" -o "#{t.name}" -unicode|
+  # MEMO: shメソッドではステータスコードが0以外でエラーと判定されてしまうため、systemメソッドを使う
+  system(%|#{KINDLEGEN} "#{t.source}" -o "#{t.name}" -unicode|)
 end
