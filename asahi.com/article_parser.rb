@@ -6,6 +6,16 @@ require "nokogiri"
 
 module AsahiCom
   module ArticleParser
+    def self.extract(src, url)
+      return {
+        "url"            => url,
+        "title"          => self.extract_title(src),
+        "published_time" => self.extract_published_time(src),
+        "images"         => self.extract_images(src, url),
+        "body"           => self.extract_body(src),
+      }
+    end
+
     def self.extract_title(src)
       doc = Nokogiri.HTML(src)
       return doc.xpath('//*[@id="HeadLine"]/h1[1]/text()').text.strip
