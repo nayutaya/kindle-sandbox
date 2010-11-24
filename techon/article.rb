@@ -1,7 +1,7 @@
 # coding: utf-8
 
 require "digest/md5"
-require File.join(File.dirname(__FILE__), "article_page_parser")
+require File.join(File.dirname(__FILE__), "article_parser")
 require File.join(File.dirname(__FILE__), "article_formatter")
 
 module TechOn
@@ -9,7 +9,7 @@ module TechOn
     def self.get(http, url)
       curl    = self.get_canonical_url(url)
       src     = http.get(curl)
-      article = TechOn::ArticlePageParser.extract(src, curl)
+      article = TechOn::ArticleParser.extract(src, curl)
 
       article["images"].each { |image|
         image["file"]     = http.get(image["url"])
