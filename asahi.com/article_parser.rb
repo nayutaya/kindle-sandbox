@@ -27,5 +27,29 @@ module AsahiCom
         {"url" => url, "caption" => caption}
       }
     end
+
+    def self.extract_body(src)
+      doc = Nokogiri.HTML(src)
+
+      # 全体の不要な要素を削除
+      doc.xpath("//comment()").remove
+      doc.xpath("//script").remove
+      doc.xpath("//noscript").remove
+      doc.xpath("//text()").
+        select { |node| node.text.strip.empty? }.
+        each   { |node| node.remove }
+
+      # 本文のdiv要素を取得
+      body = doc.xpath('//*[@id="HeadLine"]//div[@class="BodyTxt"]').first
+      # 本文の不要なclass属性を削除
+      body.remove_attribute("class")
+      # 本文内のp要素のテキストをクリーンアップ
+      body.xpath('.//p/text()').each { |node|
+        text = node.text.strip.sub(/^　/, "")
+        node.replace(Nokogiri::XML::Text.new(text, doc))
+      }
+
+      return body.to_xml(:indent => 0, :encoding => "UTF-8")
+    end
   end
 end
