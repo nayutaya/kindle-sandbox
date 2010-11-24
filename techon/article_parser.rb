@@ -67,6 +67,7 @@ module TechOn
       body.remove_attribute("id")
       # 本文内の不要なdiv要素を削除
       body.xpath('./div[@class="bpbox_right"]').remove
+      body.xpath('./div[@id="article-promo"]').remove
       # 本文内のp要素のテキストをクリーンアップ
       body.xpath('.//p/text()').each { |node|
         text = node.text.strip.sub(/^　/, "")

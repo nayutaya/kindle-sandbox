@@ -35,6 +35,7 @@ url1 = "http://techon.nikkeibp.co.jp/article/NEWS/20101111/187322/?ref=rss"
 url1 = "http://techon.nikkeibp.co.jp/article/NEWS/20101116/187415/?ref=rss"
 url1 = "http://techon.nikkeibp.co.jp/article/TOPCOL/20101115/187385/?ref=rss"
 url1 = "http://techon.nikkeibp.co.jp/article/NEWS/20101116/187442/?ref=rss"
+url1 = "http://techon.nikkeibp.co.jp/article/NEWS/20101111/187321/"
 #puts src1
 
 
