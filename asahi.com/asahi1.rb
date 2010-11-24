@@ -32,9 +32,12 @@ logger = create_logger
 http   = create_http_client(logger)
 
 url = "http://www.asahi.com/business/update/1124/TKY201011240065.html"
+url = "http://www.asahi.com/business/update/1124/TKY201011240058.html"
 src = http.get(url)
 
 #p src
 
-puts title = AsahiCom::ArticlePageParser.extract_title(src)
-puts published_time = AsahiCom::ArticlePageParser.extract_published_time(src)
+require "pp"
+pp title = AsahiCom::ArticlePageParser.extract_title(src)
+pp published_time = AsahiCom::ArticlePageParser.extract_published_time(src)
+pp images = AsahiCom::ArticlePageParser.extract_images(src, url)
