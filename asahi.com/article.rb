@@ -14,16 +14,19 @@ module AsahiCom
       article = AsahiCom::ArticleParser.extract(src, curl)
 
       article["images"].each { |image|
-        image["file"]     = http.get(image["url"])
-        image["filename"] =
+        filename, type =
           case image["url"]
-          when /\.jpg$/i then Digest::MD5.hexdigest(image["url"]) + ".jpg"
+          when /\.jpg$/i then [Digest::MD5.hexdigest(image["url"]) + ".jpg", "image/jpeg"]
           else raise("unknown type")
           end
+        image["file"]     = http.get(image["url"])
+        image["filename"] = filename
+        image["type"]     = type
       }
 
       article["file"]     = AsahiCom::ArticleFormatter.format(article)
       article["filename"] = Digest::MD5.hexdigest(article["url"]) + ".xhtml"
+      article["type"]     = "application/xhtml+xml"
 
       return article
     end
