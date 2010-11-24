@@ -103,7 +103,7 @@ env = Object.new.instance_eval {
 toc_xhtml = ERB.new(toc_xhtml_erb, nil, "-").result(env)
 
 
-filename = "epub2.epub"
+filename = "asahi.epub"
 File.unlink(filename) if File.exist?(filename)
 Zip::ZipFile.open(filename, Zip::ZipFile::CREATE) { |zip|
   # FIXME: mimetypeは無圧縮でなければならない
