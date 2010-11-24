@@ -62,9 +62,9 @@ opf_items = [
   {:id => "toc", :href => "toc.xhtml", :type => "application/xhtml+xml"},
 ]
 articles.each { |article|
-  opf_items << {:id => article["id"], :href => article["filename"], :type => "application/xhtml+xml"}
+  opf_items << {:id => article["id"], :href => article["filename"], :type => article["type"]}
   article["images"].each { |image|
-    opf_items << {:id => image["id"], :href => image["filename"], :type => "image/jpeg"}
+    opf_items << {:id => image["id"], :href => image["filename"], :type => image["type"]}
   }
 }
 
