@@ -9,17 +9,19 @@ require File.join(File.dirname(__FILE__), "article_formatter")
 module AsahiCom
   module Article
     def self.get(http, url)
-      # FIXME: 複数ページ対応を作成中
       canonical_url = self.get_canonical_url(http, url)
       page_urls     = self.get_multiple_page_urls(http, canonical_url)
-      page_urls.each { |page_url|
-        src     = http.get(page_url)
-        article = ArticleParser.extract(src, page_url)
+
+      articles = page_urls.map { |page_url|
+        src = http.get(page_url)
+        ArticleParser.extract(src, page_url)
       }
 
-      src     = http.get(canonical_url)
-      article = ArticleParser.extract(src, canonical_url)
+      (articles[1..-1] || []).each { |article|
+        articles[0]["body"] << "<hr/>" << article["body"]
+      }
 
+      article = articles.first
       article["images"].each { |image|
         filename, type =
           case image["url"]
@@ -56,7 +58,7 @@ module AsahiCom
         urls << url if url
       }
 
-      return urls
+      return urls.uniq
     end
   end
 end
