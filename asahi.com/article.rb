@@ -23,9 +23,10 @@ module AsahiCom
 
       article = articles.first
       article["images"].each { |image|
+        digest = Digest::MD5.hexdigest(image["url"])
         filename, type =
           case image["url"]
-          when /\.jpg$/i then [Digest::MD5.hexdigest(image["url"]) + ".jpg", "image/jpeg"]
+          when /\.jpg$/i then ["#{digest}.jpg", "image/jpeg"]
           else raise("unknown type")
           end
         image["file"]     = http.get(image["url"])
