@@ -5,7 +5,7 @@ require "rubygems"
 require "nokogiri"
 
 module TechOn
-  module TechOn::ArticleParser
+  module ArticleParser
     def self.extract(src, url)
       return {
         "url"            => url,

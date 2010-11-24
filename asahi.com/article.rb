@@ -11,7 +11,7 @@ module AsahiCom
     def self.get(http, url)
       curl    = self.get_canonical_url(http, url)
       src     = http.get(curl)
-      article = AsahiCom::ArticleParser.extract(src, curl)
+      article = ArticleParser.extract(src, curl)
 
       article["images"].each { |image|
         filename, type =
@@ -24,7 +24,7 @@ module AsahiCom
         image["type"]     = type
       }
 
-      article["file"]     = AsahiCom::ArticleFormatter.format(article)
+      article["file"]     = ArticleFormatter.format(article)
       article["filename"] = Digest::MD5.hexdigest(article["url"]) + ".xhtml"
       article["type"]     = "application/xhtml+xml"
 
