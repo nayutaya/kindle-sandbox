@@ -49,7 +49,7 @@ articles = manifest["urls"].each_with_index.map { |url, index|
     image["id"] = "image#{image_count}"
   }
   article
-}
+}.sort_by { |article| article["published_time"] }
 
 
 mimetype        = File.open("template/mimetype",        "rb") { |file| file.read }
