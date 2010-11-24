@@ -45,3 +45,6 @@ pp images = AsahiCom::ArticleParser.extract_images(src, url)
 pp body   = AsahiCom::ArticleParser.extract_body(src)
 =end
 pp article = AsahiCom::ArticleParser.extract(src, url)
+
+xhtml = AsahiCom::ArticleFormatter.format(article)
+puts xhtml
