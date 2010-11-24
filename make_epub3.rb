@@ -56,7 +56,7 @@ mimetype        = File.open("template/mimetype",        "rb") { |file| file.read
 container_xml   = File.open("template/container.xml",   "rb") { |file| file.read }
 content_opf_erb = File.open("template/content.opf.erb", "rb") { |file| file.read }
 toc_ncx_erb     = File.open("template/toc.ncx.erb",     "rb") { |file| file.read }
-toc_xhtml_erb   = File.open("template/asahi_com_toc.xhtml.erb", "rb") { |file| file.read }
+toc_xhtml_erb   = File.open("template/toc.xhtml.erb",   "rb") { |file| file.read }
 
 opf_items = [
   {:id => "toc", :href => "toc.xhtml", :type => "application/xhtml+xml"},
