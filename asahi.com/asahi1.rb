@@ -38,6 +38,6 @@ src = http.get(url)
 #p src
 
 require "pp"
-pp title = AsahiCom::ArticlePageParser.extract_title(src)
-pp published_time = AsahiCom::ArticlePageParser.extract_published_time(src)
-pp images = AsahiCom::ArticlePageParser.extract_images(src, url)
+pp title = AsahiCom::ArticleParser.extract_title(src)
+pp published_time = AsahiCom::ArticleParser.extract_published_time(src)
+pp images = AsahiCom::ArticleParser.extract_images(src, url)

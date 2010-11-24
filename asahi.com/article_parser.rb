@@ -5,7 +5,7 @@ require "rubygems"
 require "nokogiri"
 
 module AsahiCom
-  module ArticlePageParser
+  module ArticleParser
     def self.extract_title(src)
       doc = Nokogiri.HTML(src)
       return doc.xpath('//*[@id="HeadLine"]/h1[1]/text()').text.strip
