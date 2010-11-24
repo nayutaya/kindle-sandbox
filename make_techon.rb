@@ -38,10 +38,11 @@ uuid      = manifest["uuid"]      || UUID.new.generate
 title     = manifest["title"]     || Time.now.strftime("%Y-%m-%d %H:%M:%S")
 author    = manifest["author"]    || "Unknown"
 publisher = manifest["publisher"] || nil
+urls      = manifest["urls"].split(/\s+/)
 
 image_count = 0
 
-articles = manifest["urls"].each_with_index.map { |url, index|
+articles = urls.each_with_index.map { |url, index|
   article = TechOn::Article.get(http, url)
   article["id"] = "text#{index + 1}"
   article["images"].each { |image|

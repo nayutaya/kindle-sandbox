@@ -3,29 +3,8 @@ title: "2010-11-25 No.1"
 author: "朝日新聞"
 publisher: "朝日新聞"
 uuid: null
-urls:
-  #- ""
-  - "http://www.asahi.com/international/update/1124/TKY201011240454.html?ref=rss"
-  - "http://www.asahi.com/national/update/1124/NGY201011240021.html?ref=rss"
-  - "http://www.asahi.com/international/update/1124/TKY201011240442.html?ref=rss"
-  - "http://www.asahi.com/international/update/1124/TKY201011240428.html?ref=rss"
-  - "http://www.asahi.com/politics/update/1124/TKY201011240390.html?ref=rss"
-  - "http://www.asahi.com/national/update/1124/TKY201011240355.html?ref=rss"
-  - "http://www.asahi.com/business/update/1124/TKY201011240324.html?ref=rss"
-  - "http://www.asahi.com/international/update/1124/TKY201011240313.html?ref=rss"
-  - "http://www.asahi.com/national/update/1124/TKY201011240238.html?ref=rss"
-  - "http://www.asahi.com/politics/update/1124/TKY201011240154.html?ref=rss"
-  - "http://www.asahi.com/politics/update/1124/TKY201011240156.html?ref=rss"
-  - "http://www.asahi.com/national/update/1124/TKY201011240199.html?ref=rss"
-  - "http://www.asahi.com/national/update/1124/TKY201011240151.html?ref=rss"
-  - "http://www.asahi.com/international/update/1124/TKY201011240150.html?ref=rss"
-  - "http://www.asahi.com/international/update/1124/TKY201011240137.html?ref=rss"
-  - "http://www.asahi.com/international/update/1124/TKY201011240072.html?ref=rss"
-  - "http://www.asahi.com/business/update/1124/TKY201011240058.html?ref=rss"
-  - "http://www.asahi.com/business/update/1124/TKY201011240001.html?ref=rss"
-  - "http://www.asahi.com/international/update/1124/TKY201011230502.html?ref=rss"
-  - "http://www.asahi.com/science/update/1124/TKY201011230508.html?ref=rss"
-  - "http://www.asahi.com/international/update/1124/TKY201011230506.html?ref=rss"
-  - "http://www.asahi.com/national/update/1123/SEB201011230024.html?ref=rss"
-  - "http://www.asahi.com/business/update/1122/OSK201011220174.html?ref=rss"
-  - "http://www.asahi.com/national/update/1123/TKY201011230482.html?ref=rss"
+urls: |
+  http://www.asahi.com/international/update/1124/TKY201011240454.html?ref=rss
+  http://www.asahi.com/national/update/1124/NGY201011240021.html?ref=rss
+  http://www.asahi.com/international/update/1124/TKY201011240442.html?ref=rss
+  http://www.asahi.com/international/update/1124/TKY201011240428.html?ref=rss

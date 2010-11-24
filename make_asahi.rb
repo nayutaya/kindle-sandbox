@@ -38,15 +38,16 @@ uuid      = manifest["uuid"]      || UUID.new.generate
 title     = manifest["title"]     || Time.now.strftime("%Y-%m-%d %H:%M:%S")
 author    = manifest["author"]    || "Unknown"
 publisher = manifest["publisher"] || nil
+urls      = manifest["urls"].split(/\s+/)
 
 image_count = 0
 
-articles = manifest["urls"].each_with_index.map { |url, index|
+articles = urls.each_with_index.map { |url, index|
   article = AsahiCom::Article.get(http, url)
-  article["id"]       = "text#{index + 1}"
+  article["id"] = "text#{index + 1}"
   article["images"].each { |image|
     image_count += 1
-    image["id"]       = "image#{image_count}"
+    image["id"] = "image#{image_count}"
   }
   article
 }.sort_by { |article| article["published_time"] }

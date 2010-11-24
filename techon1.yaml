@@ -3,9 +3,8 @@ title: "2010-11-25 No.3"
 author: "techon.nikkeibp.co.jp"
 publisher: "日経BP"
 uuid: null
-urls:
-  #- ""
-  - "http://techon.nikkeibp.co.jp/article/NEWS/20101122/187557/?ref=rss"
-  - "http://techon.nikkeibp.co.jp/article/NEWS/20101122/187556/?ref=rss"
-  - "http://techon.nikkeibp.co.jp/article/NEWS/20101122/187552/?ref=rss"
-  - "http://techon.nikkeibp.co.jp/article/TOPCOL/20101119/187514/?ref=rss"
+urls: |
+  http://techon.nikkeibp.co.jp/article/NEWS/20101122/187557/?ref=rss
+  http://techon.nikkeibp.co.jp/article/NEWS/20101122/187556/?ref=rss
+  http://techon.nikkeibp.co.jp/article/NEWS/20101122/187552/?ref=rss
+  http://techon.nikkeibp.co.jp/article/TOPCOL/20101119/187514/?ref=rss
