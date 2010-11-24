@@ -33,18 +33,12 @@ http   = create_http_client(logger)
 
 url = "http://www.asahi.com/business/update/1124/TKY201011240065.html"
 url = "http://www.asahi.com/business/update/1124/TKY201011240058.html"
-src = http.get(url)
+url = "http://www.asahi.com/politics/update/1116/TKY201011160408.html?ref=rss"
 
-#p src
+article = AsahiCom::Article.get(http, url)
 
 require "pp"
-pp AsahiCom::Article.get(http, url)
-=begin
-pp title = AsahiCom::ArticleParser.extract_title(src)
-pp published_time = AsahiCom::ArticleParser.extract_published_time(src)
-pp images = AsahiCom::ArticleParser.extract_images(src, url)
-pp body   = AsahiCom::ArticleParser.extract_body(src)
-pp article = AsahiCom::ArticleParser.extract(src, url)
-xhtml = AsahiCom::ArticleFormatter.format(article)
-puts xhtml
-=end
+pp article
+File.open("out.html", "wb") { |file|
+  file.write(article["file"])
+}

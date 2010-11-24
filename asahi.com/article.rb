@@ -9,9 +9,16 @@ require File.join(File.dirname(__FILE__), "article_formatter")
 module AsahiCom
   module Article
     def self.get(http, url)
-      curl    = self.get_canonical_url(http, url)
-      src     = http.get(curl)
-      article = ArticleParser.extract(src, curl)
+      # FIXME: 複数ページ対応を作成中
+      canonical_url = self.get_canonical_url(http, url)
+      page_urls     = self.get_multiple_page_urls(http, canonical_url)
+      page_urls.each { |page_url|
+        src     = http.get(page_url)
+        article = ArticleParser.extract(src, page_url)
+      }
+
+      src     = http.get(canonical_url)
+      article = ArticleParser.extract(src, canonical_url)
 
       article["images"].each { |image|
         filename, type =
@@ -35,6 +42,21 @@ module AsahiCom
       src = http.get(url)
       doc = Nokogiri.HTML(src)
       return doc.xpath("/html/head/link[@rel='canonical']").first[:href]
+    end
+
+    def self.get_multiple_page_urls(http, url)
+      src = http.get(url)
+      doc = Nokogiri.HTML(src)
+
+      urls = [url]
+      doc.xpath('//*[@id="HeadLine"]/div/ol/li').each { |item|
+        anchor = item.xpath('./a').first
+        path = anchor[:href] if anchor
+        url  = URI.join(url, path).to_s if path
+        urls << url if url
+      }
+
+      return urls
     end
   end
 end
