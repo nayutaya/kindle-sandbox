@@ -34,6 +34,7 @@ http   = create_http_client(logger)
 url = "http://www.asahi.com/business/update/1124/TKY201011240065.html"
 url = "http://www.asahi.com/business/update/1124/TKY201011240058.html"
 url = "http://www.asahi.com/politics/update/1116/TKY201011160408.html?ref=rss"
+url = "http://www.asahi.com/international/update/1124/TKY201011240478.html"
 
 article = AsahiCom::Article.get(http, url)
 

@@ -30,12 +30,20 @@ module AsahiCom
 
     def self.extract_images(src, url)
       doc = Nokogiri.HTML(src)
-      return doc.xpath('//*[@id="HeadLine"]//table[@class="ThmbColTb"]//p').map { |parag|
+      images = []
+      images += doc.xpath('//*[@id="HeadLine"]//table[@class="ThmbColTb"]//p').map { |parag|
         path    = parag.xpath('.//img').first[:src]
         url     = URI.join(url, path).to_s
         caption = parag.xpath('./small/text()').text.strip
         {"url" => url, "caption" => caption}
       }
+      images += doc.xpath('//*[@id="HeadLine"]//div[@class="ThmbCol"]//p').map { |parag|
+        path    = parag.xpath('.//img').first[:src]
+        url     = URI.join(url, path).to_s
+        caption = parag.xpath('./small/text()').text.strip
+        {"url" => url, "caption" => caption}
+      }
+      return images
     end
 
     def self.extract_body(src)
