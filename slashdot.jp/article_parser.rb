@@ -25,7 +25,7 @@ module Slashdot
     def self.extract_published_time(src)
       doc = Nokogiri.HTML(src)
       details = doc.xpath('//*[@id="articles"]//div[@class="details"]').text.strip
-      raise unless /(\d+)年(\d+)月(\d+)日 (\d+)時(\d+)分の掲載/ =~ details
+      raise("invalid format") unless /(\d+)年(\d+)月(\d+)日 +(\d+)時(\d+)分の掲載/ =~ details
       return Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
     end
 
