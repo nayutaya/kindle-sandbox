@@ -33,7 +33,7 @@ end
 logger = create_logger
 http   = create_http_client(logger)
 
-manifest = YAML.load_file("asahi1.yaml")
+manifest = YAML.load_file("asahi.yaml")
 uuid      = manifest["uuid"]      || UUID.new.generate
 title     = manifest["title"]     || Time.now.strftime("%Y-%m-%d %H:%M:%S")
 author    = manifest["author"]    || "Unknown"

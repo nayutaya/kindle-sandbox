@@ -33,7 +33,7 @@ end
 logger = create_logger
 http   = create_http_client(logger)
 
-manifest = YAML.load_file("techon1.yaml")
+manifest = YAML.load_file("techon.yaml")
 uuid      = manifest["uuid"]      || UUID.new.generate
 title     = manifest["title"]     || Time.now.strftime("%Y-%m-%d %H:%M:%S")
 author    = manifest["author"]    || "Unknown"

@@ -2,11 +2,11 @@
 
 KINDLEGEN = "kindlegen"
 
-file "asahi.epub" => "asahi1.yaml" do |t|
+file "asahi.epub" => "asahi.yaml" do |t|
   ruby "make_asahi.rb"
 end
 
-file "techon.epub" => "techon1.yaml" do |t|
+file "techon.epub" => "techon.yaml" do |t|
   ruby "make_techon.rb"
 end
 
