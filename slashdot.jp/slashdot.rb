@@ -116,7 +116,7 @@ def extract_body(src)
   return body
 end
 
-def extract_comment(src)
+def extract_comments(src)
   doc = Nokogiri.HTML(src)
 
   # 全体の不要な要素を削除
@@ -127,29 +127,42 @@ def extract_comment(src)
     select { |node| node.text.strip.empty? }.
     each   { |node| node.remove }
 
-  comments = doc.xpath('//*[@id="commentlisting"]')
-  # 不要なli要素を削除
-  comments.xpath('./li[@class="hide"]').remove
-  # [コメントを書く]、[親コメント]などのリンクを削除
-  comments.xpath('.//span[@class="nbutton"]').remove
-  # [n 個のコメント が現在のしきい値以下です。]を削除
-  comments.xpath('./li/b').each { |item| item.parent.remove }
+  list = doc.xpath('//ul[@id="commentlisting"]')
 
-  comments.xpath('./li').each { |item|
-puts "---"
-#p item
-p title    = item.xpath('./div/div/div[@class="title"]/h4/a/text()').text.strip
-p score    = item.xpath('./div/div/div[@class="title"]/h4/span//text()').text.strip.slice(1..-2)
-p username = item.xpath('./div/div/div[@class="details"]//text()').first.text.strip
-p otherdetails = item.xpath('./div/div/div[@class="details"]/span[@class="otherdetails"]/text()').text.strip
-  raise unless /(\d+)年(\d+)月(\d+)日 (\d+)時(\d+)分/ =~ otherdetails
-p time = Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
-puts body = item.xpath('./div/div[@class="commentBody"]/div').to_xml(:indent => 0, :encoding => "UTF-8")
-
-  }
-
-  return comments.to_xml(:indent => 0, :encoding => "UTF-8")
+  return extract_child_comments(list)
 end
+
+def extract_child_comments(list)
+  # 不要なli要素を削除
+  list.xpath('./li[@class="hide"]').remove
+  # [コメントを書く]、[親コメント]などのリンクを削除
+  list.xpath('.//span[@class="nbutton"]').remove
+  # [n 個のコメント が現在のしきい値以下です。]を削除
+  list.xpath('./li/b').each { |item| item.parent.remove }
+
+  return list.xpath('./li').map { |item|
+    title        = item.xpath('./div/div/div[@class="title"]/h4/a/text()').text.strip
+    score        = item.xpath('./div/div/div[@class="title"]/h4/span//text()').text.strip.slice(1..-2)
+    user         = item.xpath('./div/div/div[@class="details"]//text()').first.text.strip
+    otherdetails = item.xpath('./div/div/div[@class="details"]/span[@class="otherdetails"]/text()').text.strip
+    body         = item.xpath('./div/div[@class="commentBody"]/div').first
+    children     = item.xpath('./ul').first
+
+    raise("invalid format") unless /(\d+)年(\d+)月(\d+)日 +(\d+)時(\d+)分/ =~ otherdetails
+    time = Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
+    body.remove_attribute("id")
+
+    {
+      "title"    => title,
+      "score"    => score,
+      "user"     => user,
+      "time"     => time,
+      "body"     => body.to_xml(:indent => 0, :encoding => "UTF-8"),
+      "comments" => (children ? extract_child_comments(children) : []),
+    }
+  }
+end
+
 
 
 
@@ -169,7 +182,8 @@ p department     = extract_department(src)
 puts "---"
 puts body           = extract_body(src)
 puts "---"
-puts comment        = extract_comment(src)
+require "pp"
+pp comments       = extract_comments(src)
 
 File.open("out.html", "wb") { |file|
   file.write(src)
