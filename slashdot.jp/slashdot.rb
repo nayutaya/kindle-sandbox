@@ -94,8 +94,33 @@ def extract_department(src)
   return details.split(/\s+/).last
 end
 
+def extract_body(src)
+  doc = Nokogiri.HTML(src)
 
-p url = "http://slashdot.jp/it/article.pl?sid=10/09/06/2337200"
+  # 全体の不要な要素を削除
+  doc.xpath("//comment()").remove
+  doc.xpath("//script").remove
+  doc.xpath("//noscript").remove
+  doc.xpath("//text()").
+    select { |node| node.text.strip.empty? }.
+    each   { |node| node.remove }
+
+  intro = doc.xpath('//*[@id="articles"]//div[@class="intro"]').first
+  intro.remove_attribute("class")
+  full = doc.xpath('//*[@id="articles"]//div[@class="full"]').first
+  full.remove_attribute("class")
+
+  body  = intro.to_xml(:indent => 0, :encoding => "UTF-8")
+  body += full.to_xml(:indent => 0, :encoding => "UTF-8")
+
+  return body
+end
+
+
+
+url = "http://slashdot.jp/it/article.pl?sid=10/09/06/2337200"
+url = "http://slashdot.jp/interview/06/01/12/0510208.shtml"
+
 p canonical_url = Slashdot::Article.get_canonical_url(http, url)
 p commented_url = Slashdot::Article.get_commented_url(canonical_url)
 
@@ -105,6 +130,7 @@ p title          = extract_title(src)
 p published_time = extract_published_time(src)
 p editor         = extract_editor(src)
 p department     = extract_department(src)
+puts body           = extract_body(src)
 
 File.open("out.html", "wb") { |file|
   file.write(src)
