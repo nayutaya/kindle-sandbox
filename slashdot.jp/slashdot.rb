@@ -83,6 +83,17 @@ def extract_published_time(src)
   return Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
 end
 
+def extract_editor(src)
+  doc = Nokogiri.HTML(src)
+  return doc.xpath('//*[@id="articles"]//div[@class="details"]/a/text()').text.strip
+end
+
+def extract_department(src)
+  doc = Nokogiri.HTML(src)
+  details = doc.xpath('//*[@id="articles"]//div[@class="details"]').text.strip
+  return details.split(/\s+/).last
+end
+
 
 p url = "http://slashdot.jp/it/article.pl?sid=10/09/06/2337200"
 p canonical_url = Slashdot::Article.get_canonical_url(http, url)
@@ -90,8 +101,10 @@ p commented_url = Slashdot::Article.get_commented_url(canonical_url)
 
 src = http.get(commented_url)
 
-p title = extract_title(src)
+p title          = extract_title(src)
 p published_time = extract_published_time(src)
+p editor         = extract_editor(src)
+p department     = extract_department(src)
 
 File.open("out.html", "wb") { |file|
   file.write(src)
