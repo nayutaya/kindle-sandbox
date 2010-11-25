@@ -89,6 +89,10 @@ pp article = Slashdot::ArticleParser.extract(src, url)
 
 xhtml = Slashdot::ArticleFormatter.format(article)
 
+puts "---"
+puts Slashdot::ArticleFormatter.format_comments(article["comments"])
+
+
 File.open("out.html", "wb") { |file|
   file.write(xhtml)
 }
