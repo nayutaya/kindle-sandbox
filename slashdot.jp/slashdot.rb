@@ -72,7 +72,7 @@ module Slashdot
 end
 
 require "article_parser"
-
+require "article_formatter"
 
 
 
@@ -85,8 +85,10 @@ p commented_url = Slashdot::Article.get_commented_url(canonical_url)
 src = http.get(commented_url)
 
 require "pp"
-pp Slashdot::ArticleParser.extract(src, url)
+pp article = Slashdot::ArticleParser.extract(src, url)
+
+xhtml = Slashdot::ArticleFormatter.format(article)
 
 File.open("out.html", "wb") { |file|
-  file.write(src)
+  file.write(xhtml)
 }
