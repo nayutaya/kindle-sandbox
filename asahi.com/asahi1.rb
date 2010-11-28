@@ -35,6 +35,7 @@ url = "http://www.asahi.com/business/update/1124/TKY201011240065.html"
 url = "http://www.asahi.com/business/update/1124/TKY201011240058.html"
 url = "http://www.asahi.com/politics/update/1116/TKY201011160408.html?ref=rss"
 url = "http://www.asahi.com/international/update/1124/TKY201011240478.html"
+url = "http://www.asahi.com/national/update/1126/OSK201011260047.html"
 
 article = AsahiCom::Article.get(http, url)
 

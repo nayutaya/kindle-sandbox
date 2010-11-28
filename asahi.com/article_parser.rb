@@ -32,17 +32,17 @@ module AsahiCom
       doc = Nokogiri.HTML(src)
       images = []
       images += doc.xpath('//*[@id="HeadLine"]//table[@class="ThmbColTb"]//p').map { |parag|
-        path    = parag.xpath('.//img').first[:src]
-        url     = URI.join(url, path).to_s
+        img     = parag.xpath('.//img').first || next
+        url     = URI.join(url, img[:src]).to_s
         caption = parag.xpath('./small/text()').text.strip
         {"url" => url, "caption" => caption}
-      }
+      }.compact
       images += doc.xpath('//*[@id="HeadLine"]//div[@class="ThmbCol"]//p').map { |parag|
-        path    = parag.xpath('.//img').first[:src]
-        url     = URI.join(url, path).to_s
+        img     = parag.xpath('.//img').first || next
+        url     = URI.join(url, img[:src]).to_s
         caption = parag.xpath('./small/text()').text.strip
         {"url" => url, "caption" => caption}
-      }
+      }.compact
       return images
     end
 
