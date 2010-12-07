@@ -8,11 +8,11 @@
  <body>
   <h1>記事一覧</h1>
   <hr/>
-  <ul>
+  <ol>
    <%- @articles.each { |title, filename| -%>
     <li><a href="<%= filename %>"><%= title %></a></li>
    <%- } -%>
-  </ul>
+  </ol>
   <hr/>
  </body>
 </html>
